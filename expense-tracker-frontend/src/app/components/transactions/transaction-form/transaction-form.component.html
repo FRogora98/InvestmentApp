@@ -1,0 +1,113 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h2>{{ isEditMode ? 'Modifica' : 'Nuova' }} Transazione</h2>
+    </div>
+    <div class="card-body">
+      @if (loading) {
+        <div class="alert alert-info">Caricamento in corso...</div>
+      }
+
+      @if (error) {
+        <div class="alert alert-danger">{{ error }}</div>
+      }
+
+      <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label for="amount" class="form-label">Importo</label>
+          <div class="input-group">
+            <span class="input-group-text">€</span>
+            <input
+              type="number"
+              class="form-control"
+              id="amount"
+              formControlName="amount"
+              step="0.01"
+              min="0.01"
+              [ngClass]="{'is-invalid': submitted && f['amount'].errors}"
+            >
+          </div>
+          @if (submitted && f['amount'].errors) {
+            <div class="invalid-feedback d-block">
+              @if (f['amount'].errors['required']) {
+                L'importo è obbligatorio.
+              }
+              @if (f['amount'].errors['min']) {
+                L'importo deve essere maggiore di zero.
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label for="type" class="form-label">Tipo</label>
+          <select
+            class="form-select"
+            id="type"
+            formControlName="type"
+            [ngClass]="{'is-invalid': submitted && f['type'].errors}"
+          >
+            @for (type of transactionTypes; track type.id) {
+              <option [value]="type.id">{{ type.name }}</option>
+            }
+          </select>
+          @if (submitted && f['type'].errors?.['required']) {
+            <div class="invalid-feedback d-block">
+              Il tipo è obbligatorio.
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label for="categoryId" class="form-label">Categoria</label>
+          <select
+            class="form-select"
+            id="categoryId"
+            formControlName="categoryId"
+          >
+            <option [value]="null">-- Seleziona una categoria --</option>
+            @for (category of getFilteredCategories(); track category.id) {
+              <option [value]="category.id">
+                @if (category.icon) {
+                  <i [class]="category.icon"></i>
+                }
+                {{ category.name }}
+              </option>
+            }
+          </select>
+          @if (getFilteredCategories().length === 0) {
+            <small class="text-muted d-block mt-2">
+              Non ci sono categorie disponibili per questo tipo di transazione.
+              <a [routerLink]="['/categories/add']">Aggiungi una categoria</a>
+            </small>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label for="date" class="form-label">Data</label>
+          <input
+            type="date"
+            class="form-control"
+            id="date"
+            formControlName="date"
+            [ngClass]="{'is-invalid': submitted && f['date'].errors}"
+          >
+          @if (submitted && f['date'].errors?.['required']) {
+            <div class="invalid-feedback d-block">
+              La data è obbligatoria.
+            </div>
+          }
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            {{ isEditMode ? 'Aggiorna' : 'Salva' }}
+          </button>
+          <button type="button" class="btn btn-secondary" [routerLink]="['/transactions']">
+            Annulla
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

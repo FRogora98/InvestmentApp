@@ -1,0 +1,87 @@
+<div class="layout-container">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <h2>Expense Tracker</h2>
+      </div>
+      <button class="sidebar-toggle d-md-none">
+        <i class="bi bi-list"></i>
+      </button>
+    </div>
+
+    <div class="user-profile">
+      <div class="avatar">
+        <img [src]="user.avatar" alt="User avatar" class="rounded-circle">
+      </div>
+      <div class="user-info">
+        <h5 class="mb-0">{{ user.name }}</h5>
+        <span class="text-muted small">Premium Account</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <ul class="nav flex-column">
+        @for (item of menuItems; track item.label) {
+          <li class="nav-item">
+            <a class="nav-link"
+               [routerLink]="item.route"
+               routerLinkActive="active">
+              <i [class]="item.icon"></i>
+              <span>{{ item.label }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="#" class="nav-link">
+        <i class="bi bi-question-circle"></i>
+        <span>Supporto</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i class="bi bi-gear"></i>
+        <span>Impostazioni</span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle d-md-none">
+          <i class="bi bi-list"></i>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <div class="dropdown">
+          <button class="btn btn-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="bi bi-bell"></i>
+            <span class="badge bg-danger">3</span>
+          </button>
+          <div class="dropdown-menu">
+            <div class="dropdown-header">Notifiche</div>
+            <a class="dropdown-item" href="#">Nuova funzionalità disponibile</a>
+            <a class="dropdown-item" href="#">Aggiornamento completato</a>
+            <a class="dropdown-item" href="#">Pagamento ricevuto</a>
+          </div>
+        </div>
+        <div class="dropdown">
+          <button class="btn btn-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle"></i>
+          </button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="#">Profilo</a>
+            <a class="dropdown-item" href="#">Impostazioni</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Logout</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,82 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Elenco Transazioni</h2>
+    <button [routerLink]="['/transactions/add']" class="btn btn-primary">
+      Aggiungi Transazione
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="alert alert-info">Caricamento in corso...</div>
+  }
+
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
+
+  @if (transactions.length === 0 && !loading) {
+    <div class="alert alert-warning">
+      Non ci sono transazioni. Aggiungine una usando il pulsante "Aggiungi Transazione".
+    </div>
+  }
+
+  @if (transactions.length > 0) {
+    <div class="table-responsive">
+      <table class="table table-hover table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Importo</th>
+            <th>Categoria</th>
+            <th>Data</th>
+            <th>Tipo</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (transaction of transactions; track transaction.id) {
+            <tr>
+              <td>{{ transaction.id }}</td>
+              <td>{{ transaction.amount | currency:'EUR' }}</td>
+              <td>
+                @if (transaction.categoryObject) {
+                  <span class="category-badge" [style.backgroundColor]="transaction.categoryObject.color">
+                    @if (transaction.categoryObject.icon) {
+                      <i [class]="transaction.categoryObject.icon" class="me-1"></i>
+                    }
+                    {{ transaction.categoryObject.name }}
+                  </span>
+                } @else {
+                  {{ transaction.category || 'Non categorizzata' }}
+                }
+              </td>
+              <td>{{ formatDate(transaction.date) }}</td>
+              <td>
+                <span [ngClass]="{
+                  'badge bg-danger': transaction.type === TransactionType.Expense,
+                  'badge bg-success': transaction.type === TransactionType.Income,
+                  'badge bg-primary': transaction.type === TransactionType.Investment
+                }">
+                  {{
+                    transaction.type === TransactionType.Expense ? 'Spesa' :
+                    transaction.type === TransactionType.Income ? 'Entrata' : 'Investimento'
+                  }}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <button [routerLink]="['/transactions/edit', transaction.id]" class="btn btn-sm btn-outline-primary me-1">
+                    Modifica
+                  </button>
+                  <button (click)="deleteTransaction(transaction.id!)" class="btn btn-sm btn-outline-danger">
+                    Elimina
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

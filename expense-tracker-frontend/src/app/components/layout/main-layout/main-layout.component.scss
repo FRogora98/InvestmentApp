@@ -1,0 +1,232 @@
+$sidebar-width: 280px;
+$sidebar-collapsed-width: 70px;
+$topbar-height: 60px;
+$primary-color: #3f51b5;
+$secondary-color: #f5f5f5;
+$text-color: #333;
+$text-muted: #6c757d;
+$border-color: #e0e0e0;
+$shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+$transition: all 0.3s ease;
+
+.layout-container {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.sidebar {
+  width: $sidebar-width;
+  background-color: white;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: $shadow;
+  transition: $transition;
+  z-index: 1000;
+
+  .sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid $border-color;
+    margin-bottom: 1.5rem;
+
+    .logo {
+      h2 {
+        margin: 0;
+        color: $primary-color;
+        font-weight: 700;
+        font-size: 1.5rem;
+      }
+    }
+
+    .sidebar-toggle {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: $text-color;
+      cursor: pointer;
+      display: none;
+
+      @media (max-width: 768px) {
+        display: block;
+      }
+    }
+  }
+
+  .user-profile {
+    display: flex;
+    align-items: center;
+    padding: 1rem 0;
+    margin-bottom: 1.5rem;
+
+    .avatar {
+      margin-right: 1rem;
+
+      img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border: 2px solid $primary-color;
+      }
+    }
+
+    .user-info {
+      h5 {
+        font-weight: 600;
+      }
+    }
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+
+    .nav-item {
+      margin-bottom: 0.5rem;
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        color: $text-color;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        transition: $transition;
+
+        i {
+          margin-right: 1rem;
+          font-size: 1.25rem;
+        }
+
+        &:hover {
+          background-color: $secondary-color;
+          color: $primary-color;
+        }
+
+        &.active {
+          background-color: rgba($primary-color, 0.1);
+          color: $primary-color;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  .sidebar-footer {
+    padding-top: 1rem;
+    border-top: 1px solid $border-color;
+    margin-top: auto;
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 0;
+      color: $text-muted;
+      text-decoration: none;
+
+      i {
+        margin-right: 1rem;
+      }
+
+      &:hover {
+        color: $primary-color;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    transform: translateX(-$sidebar-width);
+
+    &.open {
+      transform: translateX(0);
+    }
+  }
+}
+
+.main-content {
+  flex: 1;
+  margin-left: $sidebar-width;
+  transition: $transition;
+  position: relative;
+
+  .topbar {
+    height: $topbar-height;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 990;
+
+    .topbar-left {
+      .menu-toggle {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        display: none;
+
+        @media (max-width: 768px) {
+          display: block;
+        }
+      }
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+
+      .dropdown {
+        margin-left: 1rem;
+
+        .btn-link {
+          color: $text-color;
+          text-decoration: none;
+          position: relative;
+
+          .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 0.6rem;
+          }
+        }
+      }
+    }
+  }
+
+  .page-content {
+    padding: 1.5rem;
+    min-height: calc(100vh - #{$topbar-height});
+  }
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: $sidebar-width;
+    transform: translateX(-100%);
+
+    &.show {
+      transform: translateX(0);
+    }
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+}

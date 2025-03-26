@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "J00/4F4leh8Bov9u3AULB8kStWyxhmRGFdvdIDpP8NU=",
+  "Source": "expense-tracker-backend",
+  "BasePath": "_content/expense-tracker-backend",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

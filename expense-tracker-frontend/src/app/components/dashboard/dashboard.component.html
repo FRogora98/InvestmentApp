@@ -1,0 +1,324 @@
+<div class="container-fluid mt-4">
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <h1 class="display-5 fw-bold text-primary mb-0">Dashboard</h1>
+      <p class="text-muted">Panoramica delle tue finanze</p>
+    </div>
+    <div class="col-md-6 text-md-end">
+      <div class="btn-group">
+        <button class="btn btn-outline-primary">
+          <i class="bi bi-calendar3"></i> Questo mese
+        </button>
+        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          <span class="visually-hidden">Toggle Dropdown</span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">Ultima settimana</a></li>
+          <li><a class="dropdown-item" href="#">Questo mese</a></li>
+          <li><a class="dropdown-item" href="#">Ultimo trimestre</a></li>
+          <li><a class="dropdown-item" href="#">Quest'anno</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="d-flex justify-content-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Caricamento in corso...</span>
+      </div>
+    </div>
+  }
+
+  @if (error) {
+    <div class="alert alert-danger shadow-sm">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      {{ error }}
+    </div>
+  }
+
+  <!-- Card statistiche principali -->
+  <div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h6 class="text-uppercase text-muted fw-semibold mb-1">Spese totali</h6>
+              <h3 class="text-danger mb-0">{{ totalExpenses | currency:'EUR' }}</h3>
+            </div>
+            <div class="text-danger bg-danger bg-opacity-10 d-flex align-items-center justify-content-center rounded-circle" style="width: 48px; height: 48px;">
+              <i class="bi bi-cash-stack fs-4"></i>
+            </div>
+          </div>
+          <div class="text-muted small mt-3">
+            <i class="bi bi-arrow-down-right me-1"></i>
+            Rispetto al mese scorso
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h6 class="text-uppercase text-muted fw-semibold mb-1">Entrate totali</h6>
+              <h3 class="text-success mb-0">{{ totalIncome | currency:'EUR' }}</h3>
+            </div>
+            <div class="text-success bg-success bg-opacity-10 d-flex align-items-center justify-content-center rounded-circle" style="width: 48px; height: 48px;">
+              <i class="bi bi-wallet2 fs-4"></i>
+            </div>
+          </div>
+          <div class="text-muted small mt-3">
+            <i class="bi bi-arrow-up-right me-1"></i>
+            Rispetto al mese scorso
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h6 class="text-uppercase text-muted fw-semibold mb-1">Saldo attuale</h6>
+              <h3 [ngClass]="currentBalance >= 0 ? 'text-success' : 'text-danger'" class="mb-0">
+                {{ currentBalance | currency:'EUR' }}
+              </h3>
+            </div>
+            <div [ngClass]="currentBalance >= 0 ? 'text-success bg-success' : 'text-danger bg-danger'" class="bg-opacity-10 d-flex align-items-center justify-content-center rounded-circle" style="width: 48px; height: 48px;">
+              <i class="bi bi-piggy-bank fs-4"></i>
+            </div>
+          </div>
+          <div class="progress mt-3" style="height: 6px;">
+            <div class="progress-bar bg-primary" role="progressbar"
+                 [style.width.%]="(totalIncome / (totalIncome + totalExpenses)) * 100">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h6 class="text-uppercase text-muted fw-semibold mb-1">Rendimento investimenti</h6>
+              <h3 [ngClass]="totalInvestmentReturn >= 0 ? 'text-success' : 'text-danger'" class="mb-0">
+                {{ totalInvestmentReturn | currency:'EUR' }}
+              </h3>
+            </div>
+            <div class="text-primary bg-primary bg-opacity-10 d-flex align-items-center justify-content-center rounded-circle" style="width: 48px; height: 48px;">
+              <i class="bi bi-graph-up-arrow fs-4"></i>
+            </div>
+          </div>
+          <div class="text-muted small mt-3" *ngIf="investments.length > 0">
+            <i [ngClass]="totalInvestmentReturn >= 0 ? 'bi-arrow-up-right text-success' : 'bi-arrow-down-right text-danger'" class="me-1"></i>
+            {{ (totalInvestmentReturn / totalInvestmentsAmount * 100) | number:'1.1-1' }}% complessivo
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grafici e tabelle -->
+  <div class="row">
+    <!-- Distribuzione spese per categoria -->
+    <div class="col-lg-7 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Distribuzione Spese per Categoria</h5>
+          <div class="dropdown">
+            <button class="btn btn-link text-decoration-none text-muted p-0" type="button" data-bs-toggle="dropdown">
+              <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#">Visualizza rapporto dettagliato</a></li>
+              <li><a class="dropdown-item" href="#">Esporta dati</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-body">
+          @if (expenseCategoriesArray.length === 0) {
+            <div class="text-center py-5">
+              <i class="bi bi-pie-chart display-1 text-muted opacity-25"></i>
+              <p class="text-muted mt-3">Non ci sono dati sufficienti per mostrare la distribuzione delle spese.</p>
+            </div>
+          } @else {
+            <div class="table-responsive">
+              <table class="table table-borderless align-middle">
+                <thead class="text-uppercase small text-muted">
+                  <tr>
+                    <th>Categoria</th>
+                    <th class="text-end">Importo</th>
+                    <th class="text-end">%</th>
+                    <th>Distribuzione</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of expenseCategoriesArray; track item.category) {
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="category-icon rounded me-2" [style.background-color]="getCategoryColor(item.category)">
+                            <i class="bi bi-tag text-white"></i>
+                          </div>
+                          <span>{{ item.category }}</span>
+                        </div>
+                      </td>
+                      <td class="text-end fw-medium">{{ item.amount | currency:'EUR' }}</td>
+                      <td class="text-end">{{ item.percentage.toFixed(1) }}%</td>
+                      <td width="35%">
+                        <div class="progress" style="height: 8px;">
+                          <div class="progress-bar" role="progressbar"
+                              [style.width.%]="item.percentage"
+                              [style.background-color]="getCategoryColor(item.category)">
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Ultime transazioni -->
+    <div class="col-lg-5 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Ultime Transazioni</h5>
+          <a [routerLink]="['/transactions']" class="btn btn-sm btn-primary">Vedi Tutte</a>
+        </div>
+        <div class="card-body">
+          @if (recentTransactions.length === 0) {
+            <div class="text-center py-5">
+              <i class="bi bi-receipt display-1 text-muted opacity-25"></i>
+              <p class="text-muted mt-3">Non ci sono transazioni recenti da mostrare.</p>
+            </div>
+          } @else {
+            <ul class="list-group list-group-flush">
+              @for (transaction of recentTransactions; track transaction.id) {
+                <li class="list-group-item px-0 py-3 border-bottom">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                      <div [ngClass]="{
+                        'bg-danger bg-opacity-10 text-danger': transaction.type === 0,
+                        'bg-success bg-opacity-10 text-success': transaction.type === 1,
+                        'bg-primary bg-opacity-10 text-primary': transaction.type === 2
+                      }" class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                        <i [ngClass]="{
+                          'bi-cart': transaction.type === 0,
+                          'bi-wallet2': transaction.type === 1,
+                          'bi-graph-up-arrow': transaction.type === 2
+                        }" class="bi"></i>
+                      </div>
+                      <div>
+                        <p class="mb-0 fw-medium">{{ transaction.category || 'Non categorizzata' }}</p>
+                        <p class="small text-muted mb-0">{{ formatDate(transaction.date) }}</p>
+                      </div>
+                    </div>
+                    <span [ngClass]="{
+                      'text-danger': transaction.type === 0,
+                      'text-success': transaction.type === 1,
+                      'text-primary': transaction.type === 2
+                    }" class="fw-bold">
+                      {{ transaction.type === 0 ? '-' : '+' }}{{ transaction.amount | currency:'EUR' }}
+                    </span>
+                  </div>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Riga finale -->
+  <div class="row">
+    <!-- Migliori investimenti -->
+    <div class="col-lg-7 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Performance Investimenti</h5>
+          <a [routerLink]="['/investments']" class="btn btn-sm btn-primary">Vedi Tutti</a>
+        </div>
+        <div class="card-body">
+          @if (topInvestments.length === 0) {
+            <div class="text-center py-5">
+              <i class="bi bi-bar-chart display-1 text-muted opacity-25"></i>
+              <p class="text-muted mt-3">Non ci sono investimenti da mostrare.</p>
+            </div>
+          } @else {
+            <div class="table-responsive">
+              <table class="table table-borderless align-middle">
+                <thead class="text-uppercase small text-muted">
+                  <tr>
+                    <th>Investimento</th>
+                    <th class="text-end">Importo iniziale</th>
+                    <th class="text-end">Valore attuale</th>
+                    <th class="text-end">Rendimento</th>
+                    <th>Performance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (investment of topInvestments; track investment.id) {
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="category-icon rounded me-2 bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-graph-up"></i>
+                          </div>
+                          <span>{{ investment.name }}</span>
+                        </div>
+                      </td>
+                      <td class="text-end fw-medium">{{ investment.initialAmount | currency:'EUR' }}</td>
+                      <td class="text-end fw-medium">{{ investment.currentValue | currency:'EUR' }}</td>
+                      <td class="text-end" [ngClass]="investment.returnPercentage! >= 0 ? 'text-success' : 'text-danger'">
+                        {{ investment.returnPercentage!.toFixed(2) }}%
+                      </td>
+                      <td width="20%">
+                        <div class="progress" style="height: 8px;">
+                          <div class="progress-bar" role="progressbar"
+                              [style.width.%]="getProgressWidth(investment.returnPercentage!)"
+                              [ngClass]="investment.returnPercentage! >= 0 ? 'bg-success' : 'bg-danger'">
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Budget Status -->
+    <div class="col-lg-5 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Riepilogo Budget Mensile</h5>
+          <button class="btn btn-sm btn-outline-primary">Imposta Budget</button>
+        </div>
+        <div class="card-body">
+          <div class="text-center py-5">
+            <i class="bi bi-clipboard-data display-1 text-muted opacity-25"></i>
+            <p class="text-muted mt-3">Imposta un budget mensile per le tue categorie di spesa per monitorare i tuoi progressi.</p>
+            <button class="btn btn-primary mt-2">Inizia ora</button>
+          </div>
+          <!-- Qui si può aggiungere il grafico e lo stato del budget quando verrà implementato -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

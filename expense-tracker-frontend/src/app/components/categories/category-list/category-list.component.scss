@@ -1,0 +1,23 @@
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.color-box {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: inline-block;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.table th, .table td {
+  vertical-align: middle;
+}
+
+.badge {
+  padding: 0.5em 0.8em;
+  font-size: 0.8em;
+}

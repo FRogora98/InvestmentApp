@@ -1,0 +1,133 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h2>{{ isEditMode ? 'Modifica' : 'Nuovo' }} Investimento</h2>
+    </div>
+    <div class="card-body">
+      @if (loading) {
+        <div class="alert alert-info">Caricamento in corso...</div>
+      }
+
+      @if (error) {
+        <div class="alert alert-danger">{{ error }}</div>
+      }
+
+      <form [formGroup]="investmentForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label for="name" class="form-label">Nome</label>
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            formControlName="name"
+            [ngClass]="{'is-invalid': submitted && f['name'].errors}"
+          >
+          @if (submitted && f['name'].errors?.['required']) {
+            <div class="invalid-feedback d-block">
+              Il nome è obbligatorio.
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label for="initialAmount" class="form-label">Importo Iniziale</label>
+          <div class="input-group">
+            <span class="input-group-text">€</span>
+            <input
+              type="number"
+              class="form-control"
+              id="initialAmount"
+              formControlName="initialAmount"
+              step="0.01"
+              min="0.01"
+              [ngClass]="{'is-invalid': submitted && f['initialAmount'].errors}"
+            >
+          </div>
+          @if (submitted && f['initialAmount'].errors) {
+            <div class="invalid-feedback d-block">
+              @if (f['initialAmount'].errors['required']) {
+                L'importo iniziale è obbligatorio.
+              }
+              @if (f['initialAmount'].errors['min']) {
+                L'importo iniziale deve essere maggiore di zero.
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label for="purchaseDate" class="form-label">Data Acquisto</label>
+          <input
+            type="date"
+            class="form-control"
+            id="purchaseDate"
+            formControlName="purchaseDate"
+            [ngClass]="{'is-invalid': submitted && f['purchaseDate'].errors}"
+          >
+          @if (submitted && f['purchaseDate'].errors?.['required']) {
+            <div class="invalid-feedback d-block">
+              La data di acquisto è obbligatoria.
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label for="currentValue" class="form-label">Valore Attuale</label>
+          <div class="input-group">
+            <span class="input-group-text">€</span>
+            <input
+              type="number"
+              class="form-control"
+              id="currentValue"
+              formControlName="currentValue"
+              step="0.01"
+              min="0"
+              [ngClass]="{'is-invalid': submitted && f['currentValue'].errors}"
+            >
+          </div>
+          @if (submitted && f['currentValue'].errors) {
+            <div class="invalid-feedback d-block">
+              @if (f['currentValue'].errors['required']) {
+                Il valore attuale è obbligatorio.
+              }
+              @if (f['currentValue'].errors['min']) {
+                Il valore attuale non può essere negativo.
+              }
+            </div>
+          }
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-header">Riepilogo Rendimento</div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <p>Rendimento:
+                  <span [ngClass]="calculateReturn() >= 0 ? 'text-success' : 'text-danger'">
+                    {{ calculateReturn() | currency:'EUR' }}
+                  </span>
+                </p>
+              </div>
+              <div class="col-md-6">
+                <p>Rendimento %:
+                  <span [ngClass]="calculateReturnPercentage() >= 0 ? 'text-success' : 'text-danger'">
+                    {{ calculateReturnPercentage().toFixed(2) }}%
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            {{ isEditMode ? 'Aggiorna' : 'Salva' }}
+          </button>
+          <button type="button" class="btn btn-secondary" [routerLink]="['/investments']">
+            Annulla
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  azuresqledge:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    container_name: expense-tracker-db
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=StrongPassword123!  # Assicurati di usare una password forte
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - azuresqledge-data:/var/opt/mssql
+
+volumes:
+  azuresqledge-data:

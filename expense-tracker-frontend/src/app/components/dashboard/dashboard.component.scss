@@ -1,0 +1,29 @@
+.card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.progress {
+  height: 10px;
+}
+
+.badge {
+  padding: 0.5em 0.8em;
+  font-size: 0.8em;
+}
+
+.list-group-item {
+  transition: background-color 0.2s;
+}
+
+.list-group-item:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.text-success, .text-danger, .text-primary {
+  font-weight: bold;
+}

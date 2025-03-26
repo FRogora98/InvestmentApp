@@ -1,0 +1,133 @@
+<div class="content-header">
+  <h1>{{ isEditMode ? 'Modifica' : 'Nuova' }} Categoria</h1>
+</div>
+
+<div class="content-body">
+  <div class="card">
+    <div class="card-body">
+      @if (loading) {
+        <div class="alert alert-info">Caricamento in corso...</div>
+      }
+
+      @if (error) {
+        <div class="alert alert-danger">{{ error }}</div>
+      }
+
+      <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label for="name" class="form-label">Nome</label>
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            formControlName="name"
+            [ngClass]="{'is-invalid': submitted && f['name'].errors}"
+          >
+          @if (submitted && f['name'].errors?.['required']) {
+            <div class="invalid-feedback d-block">
+              Il nome è obbligatorio.
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label for="type" class="form-label">Tipo</label>
+          <select
+            class="form-select"
+            id="type"
+            formControlName="type"
+            [ngClass]="{'is-invalid': submitted && f['type'].errors}"
+          >
+            @for (type of categoryTypes; track type.id) {
+              <option [value]="type.id">{{ type.name }}</option>
+            }
+          </select>
+          @if (submitted && f['type'].errors?.['required']) {
+            <div class="invalid-feedback d-block">
+              Il tipo è obbligatorio.
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label for="color" class="form-label">Colore</label>
+          <div class="input-group">
+            <input
+              type="color"
+              class="form-control form-control-color"
+              id="color"
+              formControlName="color"
+              title="Scegli un colore"
+            >
+            <input
+              type="text"
+              class="form-control"
+              formControlName="color"
+              placeholder="#RRGGBB"
+            >
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Icona</label>
+          <div class="row">
+            <div class="col-md-9">
+              <div class="input-group mb-2">
+                <span class="input-group-text">
+                  <i [class]="categoryForm.get('icon')?.value"
+                     [style.color]="categoryForm.get('color')?.value"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="icon"
+                  list="iconsList"
+                  placeholder="Seleziona o digita un'icona (es. bi-house)"
+                >
+              </div>
+              <datalist id="iconsList">
+                @for (icon of availableIcons; track icon) {
+                  <option [value]="icon"></option>
+                }
+              </datalist>
+            </div>
+            <div class="col-md-3">
+              <div class="card h-100">
+                <div class="card-body d-flex align-items-center justify-content-center">
+                  <i [class]="categoryForm.get('icon')?.value"
+                     [style.color]="categoryForm.get('color')?.value"
+                     style="font-size: 2rem;"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <p class="text-muted mb-2">Icone popolari:</p>
+            <div class="popular-icons">
+              @for (icon of availableIcons.slice(0, 12); track icon) {
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary icon-btn"
+                  (click)="selectIcon(icon)"
+                  title="{{ icon }}"
+                >
+                  <i [class]="icon" [style.color]="categoryForm.get('color')?.value"></i>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            {{ isEditMode ? 'Aggiorna' : 'Salva' }}
+          </button>
+          <button type="button" class="btn btn-secondary" [routerLink]="['/categories']">
+            Annulla
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

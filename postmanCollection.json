@@ -1,0 +1,196 @@
+{
+    "info": {
+      "name": "Expense Tracker API",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Transactions",
+        "item": [
+          {
+            "name": "Get All Transactions",
+            "request": {
+              "method": "GET",
+              "url": "http://localhost:5094/api/Transactions"
+            }
+          },
+          {
+            "name": "Get Transaction by ID",
+            "request": {
+              "method": "GET",
+              "url": "http://localhost:5094/api/Transactions/1"
+            }
+          },
+          {
+            "name": "Create Transaction",
+            "request": {
+              "method": "POST",
+              "url": "http://localhost:5094/api/Transactions",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"amount\": 75.50,\n  \"category\": \"Groceries\",\n  \"date\": \"2023-08-15T14:30:00\",\n  \"type\": 0\n}"
+              }
+            }
+          },
+          {
+            "name": "Update Transaction",
+            "request": {
+              "method": "PUT",
+              "url": "http://localhost:5094/api/Transactions/1",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"id\": 1,\n  \"amount\": 80.25,\n  \"category\": \"Groceries\",\n  \"date\": \"2023-08-15T14:30:00\",\n  \"type\": 0\n}"
+              }
+            }
+          },
+          {
+            "name": "Delete Transaction",
+            "request": {
+              "method": "DELETE",
+              "url": "http://localhost:5094/api/Transactions/1"
+            }
+          },
+          {
+            "name": "Create Expense Transaction",
+            "request": {
+              "method": "POST",
+              "url": "http://localhost:5094/api/Transactions",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"amount\": 120.00,\n  \"category\": \"Utilities\",\n  \"date\": \"2023-08-20T10:15:00\",\n  \"type\": 0\n}"
+              }
+            }
+          },
+          {
+            "name": "Create Investment Transaction",
+            "request": {
+              "method": "POST",
+              "url": "http://localhost:5094/api/Transactions",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"amount\": 500.00,\n  \"category\": \"Stock Purchase\",\n  \"date\": \"2023-08-18T09:30:00\",\n  \"type\": 1\n}"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Investments",
+        "item": [
+          {
+            "name": "Get All Investments",
+            "request": {
+              "method": "GET",
+              "url": "http://localhost:5094/api/Investments"
+            }
+          },
+          {
+            "name": "Get Investment by ID",
+            "request": {
+              "method": "GET",
+              "url": "http://localhost:5094/api/Investments/1"
+            }
+          },
+          {
+            "name": "Create Investment",
+            "request": {
+              "method": "POST",
+              "url": "http://localhost:5094/api/Investments",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Apple Stock\",\n  \"initialAmount\": 1000.00,\n  \"purchaseDate\": \"2023-01-15T10:00:00\",\n  \"currentValue\": 1150.00\n}"
+              }
+            }
+          },
+          {
+            "name": "Update Investment",
+            "request": {
+              "method": "PUT",
+              "url": "http://localhost:5094/api/Investments/1",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"id\": 1,\n  \"name\": \"Apple Stock\",\n  \"initialAmount\": 1000.00,\n  \"purchaseDate\": \"2023-01-15T10:00:00\",\n  \"currentValue\": 1200.00\n}"
+              }
+            }
+          },
+          {
+            "name": "Delete Investment",
+            "request": {
+              "method": "DELETE",
+              "url": "http://localhost:5094/api/Investments/1"
+            }
+          },
+          {
+            "name": "Create ETF Investment",
+            "request": {
+              "method": "POST",
+              "url": "http://localhost:5094/api/Investments",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"S&P 500 ETF\",\n  \"initialAmount\": 2500.00,\n  \"purchaseDate\": \"2023-02-10T11:15:00\",\n  \"currentValue\": 2625.00\n}"
+              }
+            }
+          },
+          {
+            "name": "Create Bond Investment",
+            "request": {
+              "method": "POST",
+              "url": "http://localhost:5094/api/Investments",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Government Bond\",\n  \"initialAmount\": 5000.00,\n  \"purchaseDate\": \"2023-03-05T09:30:00\",\n  \"currentValue\": 5125.00\n}"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
