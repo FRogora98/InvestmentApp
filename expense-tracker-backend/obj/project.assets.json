@@ -5470,11 +5470,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\frogora\\InvestmentApp\\expense-tracker-backend\\expense-tracker-backend.csproj",
+      "projectUniqueName": "c:\\Users\\frogora\\InvestmentAppGit\\expense-tracker-backend\\expense-tracker-backend.csproj",
       "projectName": "expense-tracker-backend",
-      "projectPath": "C:\\Users\\frogora\\InvestmentApp\\expense-tracker-backend\\expense-tracker-backend.csproj",
+      "projectPath": "c:\\Users\\frogora\\InvestmentAppGit\\expense-tracker-backend\\expense-tracker-backend.csproj",
       "packagesPath": "C:\\Users\\frogora\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\frogora\\InvestmentApp\\expense-tracker-backend\\obj\\",
+      "outputPath": "c:\\Users\\frogora\\InvestmentAppGit\\expense-tracker-backend\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
