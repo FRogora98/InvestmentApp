@@ -1,0 +1,58 @@
+<div class="icon-selector-container">
+  <!-- Search and filter -->
+  <div class="search-container">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Cerca icona</mat-label>
+      <input matInput type="text" [(ngModel)]="searchTerm" (input)="filterIcons()">
+      <button *ngIf="searchTerm" matSuffix mat-icon-button aria-label="Clear" (click)="clearSearch()">
+        <mat-icon>close</mat-icon>
+      </button>
+      <mat-icon matPrefix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-button-toggle-group [value]="selectedCategory" (change)="filterIconsByCategory($event.value)">
+      <mat-button-toggle value="all" aria-label="Tutte le icone">
+        <mat-icon>apps</mat-icon>
+      </mat-button-toggle>
+      <mat-button-toggle *ngFor="let category of iconCategories" [value]="category.id" [aria-label]="category.name">
+        <mat-icon>{{ category.icon }}</mat-icon>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  <!-- Preview -->
+  <div class="preview-container" [style.backgroundColor]="selectedColor">
+    <mat-icon class="preview-icon">{{ selectedIcon }}</mat-icon>
+    <span class="preview-label">{{ selectedIconName }}</span>
+  </div>
+
+  <!-- Icons grid -->
+  <div class="icons-grid-container">
+    <mat-card appearance="outlined" class="icons-grid">
+      <mat-card-content>
+        <div *ngIf="filteredIcons.length === 0" class="no-icons-message">
+          <mat-icon>search_off</mat-icon>
+          <p>Nessuna icona trovata</p>
+        </div>
+
+        <div class="icons-grid-wrapper" *ngIf="filteredIcons.length > 0">
+          <button
+            *ngFor="let icon of filteredIcons"
+            mat-icon-button
+            class="icon-button"
+            [class.selected]="icon.name === selectedIcon"
+            [matTooltip]="icon.label"
+            (click)="selectIcon(icon.name)">
+            <mat-icon>{{ icon.name }}</mat-icon>
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Confirmation buttons -->
+  <div class="actions-container">
+    <button mat-button (click)="cancel()">Annulla</button>
+    <button mat-raised-button color="primary" (click)="confirm()">Conferma</button>
+  </div>
+</div>

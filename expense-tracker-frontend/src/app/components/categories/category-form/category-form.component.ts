@@ -1,16 +1,36 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Category, CategoryType } from '../../../models/category.model';
 import { CategoryService } from '../../../services/category.service';
+import { CategoryIconSelectorComponent } from '../../shared/category-icon-selector/category-icon-selector.component';
 
 @Component({
   selector: 'app-category-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressBarModule,
+    CategoryIconSelectorComponent
+  ],
   templateUrl: './category-form.component.html',
-  styleUrls: ['./category-form.component.css']
+  styleUrls: ['./category-form.component.scss']
 })
 export class CategoryFormComponent implements OnInit {
   categoryForm!: FormGroup;
@@ -19,6 +39,7 @@ export class CategoryFormComponent implements OnInit {
   loading = false;
   error = '';
   submitted = false;
+  showIconSelector = false;
 
   CategoryType = CategoryType;
 
@@ -28,17 +49,6 @@ export class CategoryFormComponent implements OnInit {
       id: CategoryType[key as keyof typeof CategoryType],
       name: key
     }));
-
-  availableIcons = [
-    'bi-house', 'bi-cart', 'bi-cash', 'bi-credit-card',
-    'bi-basket', 'bi-car-front', 'bi-airplane', 'bi-bus-front',
-    'bi-hospital', 'bi-heart-pulse', 'bi-cup-hot', 'bi-shop',
-    'bi-bag', 'bi-gift', 'bi-bank', 'bi-building', 'bi-globe',
-    'bi-laptop', 'bi-phone', 'bi-lightbulb', 'bi-droplet',
-    'bi-fuel-pump', 'bi-wrench', 'bi-tools', 'bi-book',
-    'bi-mortarboard', 'bi-camera', 'bi-music-note', 'bi-film',
-    'bi-piggy-bank', 'bi-graph-up-arrow'
-  ];
 
   constructor(
     private fb: FormBuilder,
@@ -64,8 +74,8 @@ export class CategoryFormComponent implements OnInit {
     this.categoryForm = this.fb.group({
       name: ['', Validators.required],
       type: [CategoryType.Essential, Validators.required],
-      color: ['#3498db'],
-      icon: ['bi-tag']
+      color: ['#3f51b5'],
+      icon: ['category']
     });
   }
 
@@ -76,10 +86,9 @@ export class CategoryFormComponent implements OnInit {
         this.categoryForm.patchValue({
           name: category.name,
           type: category.type,
-          color: category.color,
-          icon: category.icon
+          color: category.color || '#3f51b5',
+          icon: category.icon || 'category'
         });
-
         this.loading = false;
       },
       error: (err) => {
@@ -126,8 +135,22 @@ export class CategoryFormComponent implements OnInit {
     }
   }
 
-  selectIcon(icon: string): void {
-    this.categoryForm.get('icon')?.setValue(icon);
+  updateColorValue(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.categoryForm.get('color')?.setValue(input.value);
+  }
+
+  openIconSelector(): void {
+    this.showIconSelector = true;
+  }
+
+  closeIconSelector(): void {
+    this.showIconSelector = false;
+  }
+
+  onIconSelected(iconName: string): void {
+    this.categoryForm.get('icon')?.setValue(iconName);
+    this.closeIconSelector();
   }
 
   get f() {

@@ -1,85 +1,62 @@
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, HostListener } from '@angular/core';
-import { RouterModule, RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, RouterOutlet],
+  imports: [
+    CommonModule,
+    RouterModule,
+    MatSidenavModule,
+    MatToolbarModule,
+    MatListModule,
+    MatIconModule,
+    MatButtonModule,
+    MatMenuModule,
+    MatDividerModule,
+    MatBadgeModule
+  ],
   templateUrl: './main-layout.component.html',
   styleUrls: ['./main-layout.component.scss']
 })
-export class MainLayoutComponent implements AfterViewInit {
+export class MainLayoutComponent {
+  isSmallScreen = false;
+  isSidenavOpen = true;
+
   user = {
     name: 'Federico Rogora',
     avatar: 'assets/avatar.png'
   };
 
   menuItems = [
-    { icon: 'bi bi-speedometer2', label: 'Dashboard', route: '/dashboard' },
-    { icon: 'bi bi-cash-coin', label: 'Transazioni', route: '/transactions' },
-    { icon: 'bi bi-graph-up-arrow', label: 'Investimenti', route: '/investments' },
-    { icon: 'bi bi-bank', label: 'Conti', route: '/accounts' },
-    { icon: 'bi bi-pie-chart', label: 'Budget', route: '/budget' },
-    { icon: 'bi bi-tag', label: 'Categorie', route: '/categories' }
+    { icon: 'dashboard', label: 'Dashboard', route: '/dashboard' },
+    { icon: 'receipt_long', label: 'Transazioni', route: '/transactions' },
+    { icon: 'trending_up', label: 'Investimenti', route: '/investments' },
+    { icon: 'account_balance', label: 'Conti', route: '/accounts' },
+    { icon: 'pie_chart', label: 'Budget', route: '/budget' },
+    { icon: 'category', label: 'Categorie', route: '/categories' }
   ];
 
-  isSidebarOpen = true;
-  isSmallScreen = false;
-
-  constructor(private el: ElementRef) {}
-
-  ngAfterViewInit() {
-    this.checkScreenSize();
-    this.initMobileNav();
-  }
-
-  @HostListener('window:resize', ['$event'])
-  onResize() {
-    this.checkScreenSize();
-  }
-
-  checkScreenSize() {
-    this.isSmallScreen = window.innerWidth < 992;
-    if (this.isSmallScreen) {
-      this.isSidebarOpen = false;
-    } else {
-      this.isSidebarOpen = true;
-    }
-    this.updateSidebarState();
-  }
-
-  toggleSidebar() {
-    this.isSidebarOpen = !this.isSidebarOpen;
-    this.updateSidebarState();
-  }
-
-  updateSidebarState() {
-    const sidebar = this.el.nativeElement.querySelector('.sidebar');
-    if (sidebar) {
-      if (this.isSidebarOpen) {
-        sidebar.classList.add('show');
-      } else {
-        sidebar.classList.remove('show');
-      }
-    }
-  }
-
-  initMobileNav() {
-    const menuToggleBtns = this.el.nativeElement.querySelectorAll('.menu-toggle, .sidebar-toggle');
-    menuToggleBtns.forEach((btn: HTMLElement) => {
-      btn.addEventListener('click', () => {
-        this.toggleSidebar();
+  constructor(private breakpointObserver: BreakpointObserver) {
+    this.breakpointObserver
+      .observe([Breakpoints.XSmall, Breakpoints.Small])
+      .subscribe(result => {
+        this.isSmallScreen = result.matches;
+        this.isSidenavOpen = !result.matches;
       });
-    });
+  }
 
-    const navLinks = this.el.nativeElement.querySelectorAll('.sidebar .nav-link');
-    navLinks.forEach((link: HTMLElement) => {
-      link.addEventListener('click', () => {
-        if (this.isSmallScreen && this.isSidebarOpen) {
-          this.toggleSidebar();
-        }
-      });
-    });
+  toggleSidenav() {
+    this.isSidenavOpen = !this.isSidenavOpen;
   }
 }

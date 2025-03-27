@@ -1,0 +1,126 @@
+.icon-selector-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.search-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .search-field {
+    width: 100%;
+  }
+
+  mat-button-toggle-group {
+    display: flex;
+    flex-wrap: wrap;
+
+    mat-button-toggle {
+      flex: 1;
+      min-width: 48px;
+    }
+  }
+}
+
+.preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 24px;
+  transition: background-color 0.3s ease;
+
+  .preview-icon {
+    font-size: 64px;
+    height: 64px;
+    width: 64px;
+    color: white;
+    margin-bottom: 12px;
+  }
+
+  .preview-label {
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.icons-grid-container {
+  width: 100%;
+
+  .icons-grid {
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    border-radius: 8px;
+
+    mat-card-content {
+      padding: 8px;
+    }
+  }
+}
+
+.icons-grid-wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+  gap: 8px;
+
+  .icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    width: 48px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    &.selected {
+      background-color: rgba(63, 81, 181, 0.12);
+      color: #3f51b5;
+    }
+
+    mat-icon {
+      font-size: 24px;
+    }
+  }
+}
+
+.no-icons-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+
+  mat-icon {
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+    opacity: 0.5;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: rgba(0, 0, 0, 0.5);
+    margin: 0;
+  }
+}
+
+.actions-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
