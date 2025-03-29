@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("expense-tracker-backend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6d38dc5de8ed1101cbb2b0446f1997b9e42f4e8b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+46325302d335484d2e9b1b32ebb7c43fded5a23d")]
 [assembly: System.Reflection.AssemblyProductAttribute("expense-tracker-backend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("expense-tracker-backend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
