@@ -53,7 +53,7 @@ export class MainLayoutComponent implements OnInit {
     { icon: 'trending_up', label: 'Investimenti', route: '/investments' },
     { icon: 'category', label: 'Categorie', route: '/categories' },
     { icon: 'account_balance', label: 'Conti', route: '/accounts' },
-    { icon: 'pie_chart', label: 'Budget', route: '/budget' }
+    { icon: 'pie_chart', label: 'Budget', route: '/budgets' }
   ];
   
   notifications = [

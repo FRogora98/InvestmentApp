@@ -1,0 +1,99 @@
+<div class="budget-form-container">
+  <h2>{{isEditMode ? 'Edit' : 'Create'}} Budget</h2>
+
+  <div *ngIf="loading$ | async" class="loading-indicator">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <div *ngIf="error$ | async as error" class="error-message">
+    <div class="error-text">{{error}}</div>
+  </div>
+
+  <form [formGroup]="budgetForm" (ngSubmit)="onSubmit()" class="budget-form mat-elevation-z2">
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Budget Name</mat-label>
+        <input matInput formControlName="name" placeholder="e.g., Groceries, Utilities, etc.">
+        <mat-error *ngIf="budgetForm.get('name')?.hasError('required')">Name is required</mat-error>
+        <mat-error *ngIf="budgetForm.get('name')?.hasError('maxlength')">Name cannot exceed 100 characters</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row two-columns">
+      <mat-form-field appearance="outline">
+        <mat-label>Budget Amount</mat-label>
+        <input matInput type="number" formControlName="amount" placeholder="Budget amount">
+        <span matPrefix>$&nbsp;</span>
+        <mat-error *ngIf="budgetForm.get('amount')?.hasError('required')">Amount is required</mat-error>
+        <mat-error *ngIf="budgetForm.get('amount')?.hasError('min')">Amount must be a positive number</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Current Spent</mat-label>
+        <input matInput type="number" formControlName="spent" placeholder="Amount spent so far">
+        <span matPrefix>$&nbsp;</span>
+        <mat-error *ngIf="budgetForm.get('spent')?.hasError('min')">Spent amount must be a positive number</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Category (Optional)</mat-label>
+        <mat-select formControlName="categoryId">
+          <mat-option [value]="null">No Category</mat-option>
+          <mat-option *ngFor="let category of categories$ | async" [value]="category.id">
+            {{category.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row two-columns">
+      <mat-form-field appearance="outline">
+        <mat-label>Start Date</mat-label>
+        <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+        <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+        <mat-error *ngIf="budgetForm.get('startDate')?.hasError('required')">Start date is required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>End Date</mat-label>
+        <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+        <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+        <mat-error *ngIf="budgetForm.get('endDate')?.hasError('required')">End date is required</mat-error>
+        <mat-error *ngIf="budgetForm.get('endDate')?.hasError('invalidEndDate')">{{formErrors['endDate']}}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row recurring-options">
+      <mat-checkbox formControlName="isRecurring" class="recurring-checkbox">Recurring Budget</mat-checkbox>
+      
+      <mat-form-field appearance="outline" class="recurring-frequency">
+        <mat-label>Frequency</mat-label>
+        <mat-select formControlName="recurringFrequency">
+          <mat-option *ngFor="let frequency of recurringFrequencies" [value]="frequency">
+            {{frequency | titlecase}}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="budgetForm.get('recurringFrequency')?.hasError('required')">Frequency is required for recurring budgets</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Notes (Optional)</mat-label>
+        <textarea matInput formControlName="notes" placeholder="Additional notes..." rows="3"></textarea>
+        <mat-error *ngIf="budgetForm.get('notes')?.hasError('maxlength')">Notes cannot exceed 500 characters</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" mat-button (click)="onCancel()">Cancel</button>
+      <button type="submit" mat-raised-button color="primary" [disabled]="budgetForm.invalid || (loading$ | async)">
+        {{isEditMode ? 'Update' : 'Create'}} Budget
+      </button>
+    </div>
+  </form>
+</div>

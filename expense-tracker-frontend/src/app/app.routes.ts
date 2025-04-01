@@ -46,6 +46,18 @@ export const routes: Routes = [
       {
         path: 'categories/edit/:id',
         loadComponent: () => import('./components/categories/category-form/category-form.component').then(m => m.CategoryFormComponent)
+      },
+      {
+        path: 'budgets',
+        loadComponent: () => import('./components/budgets/budget-list/budget-list.component').then(m => m.BudgetListComponent)
+      },
+      {
+        path: 'budgets/new',
+        loadComponent: () => import('./components/budgets/budget-form/budget-form.component').then(m => m.BudgetFormComponent)
+      },
+      {
+        path: 'budgets/edit/:id',
+        loadComponent: () => import('./components/budgets/budget-form/budget-form.component').then(m => m.BudgetFormComponent)
       }
     ]
   }

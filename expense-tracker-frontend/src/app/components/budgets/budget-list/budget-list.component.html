@@ -1,0 +1,124 @@
+<div class="budget-list-container">
+  <h2>Budget Management</h2>
+
+  <div class="budget-summary mat-elevation-z2" *ngIf="budgetSummary$ | async as summary">
+    <div class="summary-item">
+      <span class="label">Total Budget</span>
+      <span class="value">${{summary.total | number:'1.2-2'}}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Total Spent</span>
+      <span class="value">${{summary.spent | number:'1.2-2'}}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Remaining</span>
+      <span class="value" [ngClass]="{'negative': summary.remaining < 0}">
+        ${{summary.remaining | number:'1.2-2'}}
+      </span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Budget Utilization</span>
+      <div class="progress-container">
+        <mat-progress-bar
+          [color]="summary.percentUsed > 90 ? 'warn' : summary.percentUsed > 70 ? 'accent' : 'primary'"
+          mode="determinate"
+          [value]="summary.percentUsed">
+        </mat-progress-bar>
+        <span class="percent">{{summary.percentUsed | number:'1.0-0'}}%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions-bar">
+    <button mat-raised-button color="primary" (click)="onAdd()">
+      <mat-icon>add</mat-icon> New Budget
+    </button>
+    <button mat-button (click)="loadData()">
+      <mat-icon>refresh</mat-icon> Refresh
+    </button>
+  </div>
+
+  <div *ngIf="loading$ | async" class="loading-indicator">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <div *ngIf="error$ | async as error" class="error-message">
+    <div class="error-text">{{error}}</div>
+  </div>
+
+  <div class="table-container mat-elevation-z2">
+    <table mat-table [dataSource]="(budgets$ | async) || []" class="budget-table">
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let budget">
+          <div class="budget-name">{{budget.name}}</div>
+          <div class="budget-category" *ngIf="budget.categoryId">
+            Category: {{getCategoryName(budget.categoryId)}}
+          </div>
+          <div class="budget-date" *ngIf="budget.startDate">
+            <span>{{budget.startDate | date:'shortDate'}} - {{budget.endDate | date:'shortDate'}}</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Amount Column -->
+      <ng-container matColumnDef="amount">
+        <th mat-header-cell *matHeaderCellDef>Budget</th>
+        <td mat-cell *matCellDef="let budget">${{budget.amount | number:'1.2-2'}}</td>
+      </ng-container>
+
+      <!-- Spent Column -->
+      <ng-container matColumnDef="spent">
+        <th mat-header-cell *matHeaderCellDef>Spent</th>
+        <td mat-cell *matCellDef="let budget">${{budget.spent | number:'1.2-2'}}</td>
+      </ng-container>
+
+      <!-- Remaining Column -->
+      <ng-container matColumnDef="remaining">
+        <th mat-header-cell *matHeaderCellDef>Remaining</th>
+        <td mat-cell *matCellDef="let budget" [ngClass]="{'negative': calculateRemaining(budget) < 0}">
+          ${{calculateRemaining(budget) | number:'1.2-2'}}
+        </td>
+      </ng-container>
+
+      <!-- Progress Column -->
+      <ng-container matColumnDef="progress">
+        <th mat-header-cell *matHeaderCellDef>Progress</th>
+        <td mat-cell *matCellDef="let budget">
+          <div class="progress-container">
+            <mat-progress-bar
+              [color]="getProgressColor(calculatePercentage(budget))"
+              mode="determinate"
+              [value]="calculatePercentage(budget)">
+            </mat-progress-bar>
+            <span class="percent">{{calculatePercentage(budget) | number:'1.0-0'}}%</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let budget">
+          <button mat-icon-button color="primary" (click)="onEdit(budget)" matTooltip="Edit Budget">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="onDelete(budget.id)" matTooltip="Delete Budget">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      <!-- No Data Row -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="6">
+          No budgets found. Click "New Budget" to create one.
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
