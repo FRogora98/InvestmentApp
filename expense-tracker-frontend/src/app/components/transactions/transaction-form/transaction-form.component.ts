@@ -12,7 +12,7 @@ import { TransactionService } from '../../../services/transaction.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './transaction-form.component.html',
-  styleUrls: ['./transaction-form.component.css']
+  styleUrls: ['./transaction-form.component.scss']
 })
 export class TransactionFormComponent implements OnInit {
   transactionForm!: FormGroup;

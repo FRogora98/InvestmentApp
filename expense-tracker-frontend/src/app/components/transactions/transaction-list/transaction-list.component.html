@@ -1,82 +1,505 @@
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Elenco Transazioni</h2>
-    <button [routerLink]="['/transactions/add']" class="btn btn-primary">
-      Aggiungi Transazione
-    </button>
+<div class="page-container fade-in">
+  <div class="section-title">
+    <div>
+      <h2>Transazioni</h2>
+      <div class="subtitle">Gestisci e visualizza tutte le tue transazioni</div>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+      <button mat-stroked-button [routerLink]="['/transactions']" class="filter-button">
+        <mat-icon>filter_list</mat-icon>
+        Filtri
+      </button>
+      <button mat-flat-button color="primary" [routerLink]="['/transactions/add']" class="add-button">
+        <mat-icon>add</mat-icon>
+        Nuova Transazione
+      </button>
+    </div>
   </div>
 
+  <!-- Search and Filter Bar -->
+  <mat-card class="filter-card">
+    <mat-card-content>
+      <div class="filter-container">
+        <div class="search-box">
+          <mat-icon class="search-icon">search</mat-icon>
+          <input type="text" placeholder="Cerca transazioni..." class="search-input">
+        </div>
+        
+        <div class="filters">
+          <mat-button-toggle-group [(ngModel)]="activeFilter" (change)="applyFilter()">
+            <mat-button-toggle value="all">Tutte</mat-button-toggle>
+            <mat-button-toggle value="0">Spese</mat-button-toggle>
+            <mat-button-toggle value="1">Entrate</mat-button-toggle>
+            <mat-button-toggle value="2">Investimenti</mat-button-toggle>
+          </mat-button-toggle-group>
+          
+          <mat-form-field appearance="outline" class="date-filter">
+            <mat-label>Periodo</mat-label>
+            <mat-select [(value)]="selectedPeriod" (selectionChange)="applyFilter()">
+              <mat-option value="all">Tutti</mat-option>
+              <mat-option value="today">Oggi</mat-option>
+              <mat-option value="week">Questa settimana</mat-option>
+              <mat-option value="month">Questo mese</mat-option>
+              <mat-option value="year">Quest'anno</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading State -->
   @if (loading) {
-    <div class="alert alert-info">Caricamento in corso...</div>
-  }
-
-  @if (error) {
-    <div class="alert alert-danger">{{ error }}</div>
-  }
-
-  @if (transactions.length === 0 && !loading) {
-    <div class="alert alert-warning">
-      Non ci sono transazioni. Aggiungine una usando il pulsante "Aggiungi Transazione".
+    <div class="loading-indicator">
+      <div class="spinner-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <div class="spinner-message">Caricamento transazioni...</div>
+      </div>
     </div>
   }
 
-  @if (transactions.length > 0) {
-    <div class="table-responsive">
-      <table class="table table-hover table-striped">
-        <thead class="table-dark">
-          <tr>
-            <th>ID</th>
-            <th>Importo</th>
-            <th>Categoria</th>
-            <th>Data</th>
-            <th>Tipo</th>
-            <th>Azioni</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (transaction of transactions; track transaction.id) {
-            <tr>
-              <td>{{ transaction.id }}</td>
-              <td>{{ transaction.amount | currency:'EUR' }}</td>
-              <td>
-                @if (transaction.categoryObject) {
-                  <span class="category-badge" [style.backgroundColor]="transaction.categoryObject.color">
-                    @if (transaction.categoryObject.icon) {
-                      <i [class]="transaction.categoryObject.icon" class="me-1"></i>
-                    }
-                    {{ transaction.categoryObject.name }}
-                  </span>
-                } @else {
-                  {{ transaction.category || 'Non categorizzata' }}
-                }
-              </td>
-              <td>{{ formatDate(transaction.date) }}</td>
-              <td>
-                <span [ngClass]="{
-                  'badge bg-danger': transaction.type === TransactionType.Expense,
-                  'badge bg-success': transaction.type === TransactionType.Income,
-                  'badge bg-primary': transaction.type === TransactionType.Investment
-                }">
-                  {{
-                    transaction.type === TransactionType.Expense ? 'Spesa' :
-                    transaction.type === TransactionType.Income ? 'Entrata' : 'Investimento'
-                  }}
-                </span>
-              </td>
-              <td>
-                <div class="btn-group">
-                  <button [routerLink]="['/transactions/edit', transaction.id]" class="btn btn-sm btn-outline-primary me-1">
-                    Modifica
-                  </button>
-                  <button (click)="deleteTransaction(transaction.id!)" class="btn btn-sm btn-outline-danger">
-                    Elimina
-                  </button>
+  <!-- Error State -->
+  @if (error) {
+    <mat-card class="error-card">
+      <mat-card-content>
+        <mat-icon color="warn">error_outline</mat-icon>
+        <h3>Si è verificato un errore</h3>
+        <p>{{ error }}</p>
+        <button mat-flat-button color="primary" (click)="loadTransactions()">Riprova</button>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Empty State -->
+  @if (transactions.length === 0 && !loading && !error) {
+    <div class="empty-state">
+      <mat-icon class="empty-state-icon">receipt_long</mat-icon>
+      <h3 class="empty-state-title">Nessuna transazione trovata</h3>
+      <p class="empty-state-message">Non ci sono transazioni da visualizzare. Inizia aggiungendo la tua prima transazione.</p>
+      <button mat-flat-button color="primary" [routerLink]="['/transactions/add']">
+        <mat-icon>add</mat-icon>
+        Aggiungi Transazione
+      </button>
+    </div>
+  }
+
+  <!-- Transaction List -->
+  @if (transactions.length > 0 && !loading && !error) {
+    <!-- Mobile View: Card List -->
+    <div class="transaction-card-list show-on-mobile">
+      @for (transaction of transactions; track transaction.id) {
+        <mat-card class="transaction-card">
+          <mat-card-content>
+            <div class="transaction-card-header">
+              <div class="transaction-icon" [ngClass]="{
+                'expense-bg': transaction.type === TransactionType.Expense,
+                'income-bg': transaction.type === TransactionType.Income,
+                'investment-bg': transaction.type === TransactionType.Investment
+              }">
+                <mat-icon>{{ getTransactionTypeIcon(transaction.type) }}</mat-icon>
+              </div>
+              <div class="transaction-details">
+                <div class="transaction-title">
+                  @if (transaction.categoryObject) {
+                    <span class="category-name">{{ transaction.categoryObject.name }}</span>
+                  } @else {
+                    <span class="category-name">{{ transaction.category || 'Non categorizzata' }}</span>
+                  }
                 </div>
-              </td>
-            </tr>
-          }
-        </tbody>
+                <div class="transaction-date">{{ formatDate(transaction.date) }}</div>
+              </div>
+              <div class="transaction-amount" [ngClass]="{
+                'expense-value': transaction.type === TransactionType.Expense,
+                'income-value': transaction.type === TransactionType.Income,
+                'investment-value': transaction.type === TransactionType.Investment
+              }">
+                {{ transaction.type === TransactionType.Expense ? '-' : '+' }}{{ transaction.amount | currency:'EUR' }}
+              </div>
+            </div>
+            <div class="transaction-card-actions">
+              <button mat-button color="primary" [routerLink]="['/transactions/edit', transaction.id]">
+                <mat-icon>edit</mat-icon> Modifica
+              </button>
+              <button mat-button color="warn" (click)="deleteTransaction(transaction.id!)">
+                <mat-icon>delete</mat-icon> Elimina
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+
+    <!-- Desktop View: Table -->
+    <div class="table-container hide-on-mobile">
+      <table mat-table [dataSource]="transactions" class="transaction-table">
+        <!-- Type Column -->
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Tipo</th>
+          <td mat-cell *matCellDef="let transaction">
+            <div class="transaction-type-badge" [ngClass]="{
+              'expense-badge': transaction.type === TransactionType.Expense,
+              'income-badge': transaction.type === TransactionType.Income,
+              'investment-badge': transaction.type === TransactionType.Investment
+            }">
+              <mat-icon class="type-icon">{{ getTransactionTypeIcon(transaction.type) }}</mat-icon>
+              <span>{{ getTransactionTypeText(transaction.type) }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Date Column -->
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef>Data</th>
+          <td mat-cell *matCellDef="let transaction">{{ formatDate(transaction.date) }}</td>
+        </ng-container>
+
+        <!-- Category Column -->
+        <ng-container matColumnDef="category">
+          <th mat-header-cell *matHeaderCellDef>Categoria</th>
+          <td mat-cell *matCellDef="let transaction">
+            @if (transaction.categoryObject) {
+              <div class="category-chip" [style.backgroundColor]="transaction.categoryObject.color + '20'" [style.color]="transaction.categoryObject.color">
+                @if (transaction.categoryObject.icon) {
+                  <mat-icon class="category-icon">{{ transaction.categoryObject.icon }}</mat-icon>
+                }
+                {{ transaction.categoryObject.name }}
+              </div>
+            } @else {
+              <div class="category-chip default">
+                <mat-icon class="category-icon">category</mat-icon>
+                {{ transaction.category || 'Non categorizzata' }}
+              </div>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Description Column -->
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef>Descrizione</th>
+          <td mat-cell *matCellDef="let transaction">{{ transaction.description || 'Nessuna descrizione' }}</td>
+        </ng-container>
+
+        <!-- Amount Column -->
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef class="amount-column">Importo</th>
+          <td mat-cell *matCellDef="let transaction" class="amount-column">
+            <span [ngClass]="{
+              'expense-value': transaction.type === TransactionType.Expense,
+              'income-value': transaction.type === TransactionType.Income,
+              'investment-value': transaction.type === TransactionType.Investment
+            }">
+              {{ transaction.type === TransactionType.Expense ? '-' : '+' }}{{ transaction.amount | currency:'EUR' }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="actions-column">Azioni</th>
+          <td mat-cell *matCellDef="let transaction" class="actions-column">
+            <div class="action-buttons">
+              <button mat-icon-button color="primary" [routerLink]="['/transactions/edit', transaction.id]" matTooltip="Modifica">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="deleteTransaction(transaction.id!)" matTooltip="Elimina">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
     </div>
+
+    <!-- Pagination -->
+    <mat-paginator 
+      [length]="totalTransactions"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 25, 50]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons>
+    </mat-paginator>
   }
 </div>
+
+<style>
+  /* Local Component Styles */
+  .filter-card {
+    margin-bottom: 24px;
+    border-radius: var(--border-radius-md);
+  }
+  
+  .filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+  }
+  
+  .search-box {
+    position: relative;
+    min-width: 300px;
+    flex: 1;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 12px 16px 12px 40px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-sm);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  
+  .search-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.1);
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-500);
+  }
+  
+  .filters {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  
+  .date-filter {
+    width: 150px;
+    margin-bottom: -22px;
+  }
+  
+  .transaction-type-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  
+  .expense-badge {
+    background-color: var(--danger-light);
+    color: var(--danger-color);
+  }
+  
+  .income-badge {
+    background-color: var(--success-light);
+    color: var(--success-color);
+  }
+  
+  .investment-badge {
+    background-color: rgba(63, 81, 181, 0.1);
+    color: var(--primary-color);
+  }
+  
+  .type-icon {
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+    margin-right: 4px;
+  }
+  
+  .category-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--gray-700);
+  }
+  
+  .category-chip.default {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--gray-700);
+  }
+  
+  .category-chip .category-icon {
+    font-size: 14px;
+    height: 14px;
+    width: 14px;
+    margin-right: 4px;
+  }
+  
+  .amount-column {
+    text-align: right;
+    padding-right: 24px !important;
+  }
+  
+  .actions-column {
+    width: 100px;
+    text-align: center;
+  }
+  
+  .table-container {
+    margin-bottom: 24px;
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .transaction-table {
+    width: 100%;
+  }
+  
+  /* Mobile Card Styles */
+  .transaction-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .transaction-card {
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .transaction-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md) !important;
+  }
+  
+  .transaction-card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .transaction-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+  }
+  
+  .transaction-icon mat-icon {
+    color: white;
+  }
+  
+  .expense-bg {
+    background-color: var(--danger-color);
+  }
+  
+  .income-bg {
+    background-color: var(--success-color);
+  }
+  
+  .investment-bg {
+    background-color: var(--primary-color);
+  }
+  
+  .transaction-details {
+    flex: 1;
+  }
+  
+  .transaction-title {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  
+  .transaction-date {
+    font-size: 14px;
+    color: var(--gray-600);
+  }
+  
+  .transaction-amount {
+    font-weight: 600;
+    font-size: 18px;
+  }
+  
+  .transaction-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  
+  /* Add Button */
+  .add-button {
+    border-radius: 50px;
+    padding: 0 20px;
+    height: 40px;
+  }
+  
+  .filter-button {
+    border-radius: 50px;
+    padding: 0 16px;
+    height: 40px;
+  }
+  
+  .add-button mat-icon, .filter-button mat-icon {
+    margin-right: 8px;
+  }
+  
+  /* Error Card */
+  .error-card {
+    text-align: center;
+    padding: 32px;
+    margin-bottom: 24px;
+    
+    mat-icon {
+      font-size: 48px;
+      height: 48px;
+      width: 48px;
+      margin-bottom: 16px;
+    }
+    
+    h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      font-weight: 500;
+    }
+    
+    p {
+      margin: 0 0 24px;
+      color: var(--gray-600);
+    }
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .filter-container {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .filters {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .search-box {
+      min-width: 100%;
+    }
+    
+    .date-filter {
+      width: 100%;
+    }
+    
+    .section-title {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    
+    .section-title > div:last-child {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+</style>

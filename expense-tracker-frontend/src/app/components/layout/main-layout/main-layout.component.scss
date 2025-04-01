@@ -1,69 +1,141 @@
 /* main-layout.component.scss */
 .sidenav-container {
   height: 100vh;
+  background-color: var(--gray-50);
 }
 
 .sidenav {
   width: 280px;
   display: flex;
   flex-direction: column;
-  background-color: #f5f5f5;
+  background-color: white;
+  border-right: none;
+  box-shadow: var(--shadow-md);
+  
+  &.mat-drawer-side {
+    border-right: none;
+  }
 }
 
 .sidenav-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
-
+  padding: 24px 20px;
+  
   .app-title {
     margin: 0;
     font-size: 24px;
-    font-weight: 400;
-    color: #3f51b5;
+    font-weight: 600;
+    background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
   }
 }
 
 .user-profile {
   display: flex;
   align-items: center;
-  padding: 16px;
-  margin-bottom: 16px;
-
+  padding: 0 20px 24px;
+  margin-bottom: 8px;
+  
   .avatar {
     margin-right: 16px;
-
+    
     img {
       width: 48px;
       height: 48px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid #3f51b5;
+      border: 2px solid var(--primary-light);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
   }
-
+  
   .user-info {
     .user-name {
       margin: 0;
       font-size: 16px;
-      font-weight: 500;
+      font-weight: 600;
+      color: var(--gray-900);
     }
-
+    
     .user-type {
+      display: inline-block;
       font-size: 12px;
-      color: rgba(0, 0, 0, 0.54);
+      color: var(--primary-color);
+      font-weight: 500;
+      background-color: rgba(63, 81, 181, 0.1);
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-top: 4px;
     }
   }
 }
 
-.active-link {
-  background-color: rgba(63, 81, 181, 0.12);
-  color: #3f51b5;
+::ng-deep .mat-mdc-list-item {
+  margin: 8px 12px !important;
+  border-radius: var(--border-radius-sm) !important;
+  
+  &.active-link {
+    background-color: rgba(63, 81, 181, 0.12) !important;
+    
+    .mat-icon, .mdc-list-item__primary-text {
+      color: var(--primary-color) !important;
+      font-weight: 500 !important;
+    }
+  }
+  
+  .mat-icon {
+    margin-right: 12px;
+    color: var(--gray-700);
+  }
+  
+  .mdc-list-item__primary-text {
+    color: var(--gray-800);
+    font-weight: 400;
+    font-size: 15px;
+  }
+  
+  &:hover {
+    background-color: var(--gray-100) !important;
+  }
 }
 
 .sidenav-footer {
   margin-top: auto;
-  padding-bottom: 16px;
+  padding: 16px 0;
+  
+  .mat-divider {
+    margin: 8px 0 16px;
+  }
+  
+  .mat-mdc-list-item {
+    color: var(--gray-700);
+    
+    .mat-icon {
+      font-size: 20px;
+      color: var(--gray-600);
+    }
+  }
+}
+
+.mat-toolbar.mat-primary {
+  background: white;
+  color: var(--gray-900);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  
+  button {
+    color: var(--gray-700);
+    
+    &:hover {
+      color: var(--primary-color);
+    }
+  }
 }
 
 .toolbar-spacer {
@@ -71,14 +143,78 @@
 }
 
 .content-container {
-  padding: 24px;
+  padding: 32px;
   height: calc(100vh - 64px);
   overflow: auto;
+  background-color: var(--gray-50);
+  
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
 }
 
-// Responsive adjustments
+/* Badge override */
+::ng-deep .mat-badge-content {
+  font-weight: 600;
+  font-size: 10px;
+  min-width: 18px;
+  height: 18px;
+  line-height: 18px;
+  right: -8px !important;
+  top: -8px !important;
+}
+
+/* Menu customization */
+::ng-deep .mat-mdc-menu-panel {
+  border-radius: var(--border-radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+  min-width: 220px !important;
+  max-width: 280px !important;
+  
+  .mat-mdc-menu-content {
+    padding: 8px !important;
+  }
+  
+  .mat-mdc-menu-item {
+    border-radius: var(--border-radius-sm) !important;
+    margin: 2px 0 !important;
+    
+    .mat-icon {
+      margin-right: 12px;
+      color: var(--gray-700);
+    }
+    
+    &:hover {
+      background-color: var(--gray-100) !important;
+    }
+    
+    .mdc-list-item__primary-text {
+      font-size: 14px;
+    }
+  }
+  
+  h3[mat-subheader] {
+    color: var(--gray-600);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 16px 16px 8px;
+    margin: 0;
+    font-weight: 600;
+  }
+}
+
+/* Mobile adjustments */
 @media (max-width: 768px) {
-  .content-container {
+  .sidenav {
+    width: 260px;
+  }
+  
+  .sidenav-header {
     padding: 16px;
+  }
+  
+  .user-profile {
+    padding: 0 16px 16px;
   }
 }

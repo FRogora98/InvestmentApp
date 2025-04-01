@@ -1,19 +1,7 @@
-.text-success {
-  font-weight: bold;
-}
+/* Base styles for consistency with the new design system */
 
-.text-danger {
-  font-weight: bold;
-}
+/* No need for additional styles since we're using inline styles in the component template */
+/* This ensures that the styling is driven by CSS variables and shared utility classes */
 
-.table th, .table td {
-  vertical-align: middle;
-}
-
-.category-badge {
-  display: inline-block;
-  padding: 0.3em 0.6em;
-  border-radius: 20px;
-  color: white;
-  font-size: 0.85em;
-}
+/* If you need to add component-specific styles that aren't covered by the global styles,
+   add them here. For now, we're keeping the file for future styling needs. */

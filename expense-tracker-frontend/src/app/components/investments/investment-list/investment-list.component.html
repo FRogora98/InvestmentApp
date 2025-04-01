@@ -1,68 +1,561 @@
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Elenco Investimenti</h2>
-    <button [routerLink]="['/investments/add']" class="btn btn-primary">
-      Aggiungi Investimento
-    </button>
+<div class="page-container fade-in">
+  <div class="section-title">
+    <div>
+      <h2>Investimenti</h2>
+      <div class="subtitle">Gestisci e monitora i tuoi investimenti</div>
+    </div>
+    <div class="d-flex align-items-center">
+      <button mat-flat-button color="primary" [routerLink]="['/investments/add']" class="add-button">
+        <mat-icon>add</mat-icon>
+        Nuovo Investimento
+      </button>
+    </div>
   </div>
 
+  <!-- Summary Cards -->
+  <div class="investment-summary">
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <div class="summary-icon">
+          <mat-icon>account_balance</mat-icon>
+        </div>
+        <div class="summary-content">
+          <div class="summary-label">Capitale Investito</div>
+          <div class="summary-value">{{ totalInvested | currency:'EUR' }}</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <div class="summary-icon value-icon">
+          <mat-icon>trending_up</mat-icon>
+        </div>
+        <div class="summary-content">
+          <div class="summary-label">Valore Attuale</div>
+          <div class="summary-value">{{ totalCurrentValue | currency:'EUR' }}</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <div class="summary-icon return-icon" [ngClass]="{'negative': totalReturn < 0}">
+          <mat-icon>{{ totalReturn >= 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+        </div>
+        <div class="summary-content">
+          <div class="summary-label">Guadagno Totale</div>
+          <div class="summary-value" [ngClass]="{'positive-value': totalReturn >= 0, 'negative-value': totalReturn < 0}">
+            {{ totalReturn | currency:'EUR' }}
+            <span class="percentage">
+              ({{ totalReturnPercentage.toFixed(2) }}%)
+            </span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Loading State -->
   @if (loading) {
-    <div class="alert alert-info">Caricamento in corso...</div>
-  }
-
-  @if (error) {
-    <div class="alert alert-danger">{{ error }}</div>
-  }
-
-  @if (investments.length === 0 && !loading) {
-    <div class="alert alert-warning">
-      Non ci sono investimenti. Aggiungine uno usando il pulsante "Aggiungi Investimento".
+    <div class="loading-indicator">
+      <div class="spinner-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <div class="spinner-message">Caricamento investimenti...</div>
+      </div>
     </div>
   }
 
-  @if (investments.length > 0) {
-    <div class="table-responsive">
-      <table class="table table-hover table-striped">
-        <thead class="table-dark">
-          <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Importo Iniziale</th>
-            <th>Data Acquisto</th>
-            <th>Valore Attuale</th>
-            <th>Rendimento</th>
-            <th>Rendimento %</th>
-            <th>Azioni</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (investment of investments; track investment.id) {
-            <tr>
-              <td>{{ investment.id }}</td>
-              <td>{{ investment.name }}</td>
-              <td>{{ investment.initialAmount | currency:'EUR' }}</td>
-              <td>{{ formatDate(investment.purchaseDate) }}</td>
-              <td>{{ investment.currentValue | currency:'EUR' }}</td>
-              <td [ngClass]="calculateReturn(investment) >= 0 ? 'text-success' : 'text-danger'">
-                {{ calculateReturn(investment) | currency:'EUR' }}
-              </td>
-              <td [ngClass]="calculateReturnPercentage(investment) >= 0 ? 'text-success' : 'text-danger'">
-                {{ calculateReturnPercentage(investment).toFixed(2) }}%
-              </td>
-              <td>
-                <div class="btn-group">
-                  <button [routerLink]="['/investments/edit', investment.id]" class="btn btn-sm btn-outline-primary me-1">
-                    Modifica
-                  </button>
-                  <button (click)="deleteInvestment(investment.id!)" class="btn btn-sm btn-outline-danger">
-                    Elimina
-                  </button>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
+  <!-- Error State -->
+  @if (error) {
+    <mat-card class="error-card">
+      <mat-card-content>
+        <mat-icon color="warn">error_outline</mat-icon>
+        <h3>Si è verificato un errore</h3>
+        <p>{{ error }}</p>
+        <button mat-flat-button color="primary" (click)="loadInvestments()">Riprova</button>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Empty State -->
+  @if (investments.length === 0 && !loading && !error) {
+    <div class="empty-state">
+      <mat-icon class="empty-state-icon">account_balance</mat-icon>
+      <h3 class="empty-state-title">Nessun investimento trovato</h3>
+      <p class="empty-state-message">Non ci sono investimenti da visualizzare. Inizia aggiungendo il tuo primo investimento.</p>
+      <button mat-flat-button color="primary" [routerLink]="['/investments/add']">
+        <mat-icon>add</mat-icon>
+        Aggiungi Investimento
+      </button>
+    </div>
+  }
+
+  <!-- Investment List -->
+  @if (investments.length > 0 && !loading && !error) {
+    <!-- Mobile View: Card List -->
+    <div class="investment-card-list show-on-mobile">
+      @for (investment of investments; track investment.id) {
+        <mat-card class="investment-card">
+          <mat-card-content>
+            <div class="investment-card-header">
+              <div class="investment-icon">
+                <mat-icon>account_balance</mat-icon>
+              </div>
+              <div class="investment-details">
+                <div class="investment-name">{{ investment.name }}</div>
+                <div class="investment-date">{{ formatDate(investment.purchaseDate) }}</div>
+              </div>
+            </div>
+            
+            <div class="investment-values">
+              <div class="value-item">
+                <div class="value-label">Iniziale</div>
+                <div class="value-amount">{{ investment.initialAmount | currency:'EUR' }}</div>
+              </div>
+              <div class="value-separator">
+                <mat-icon>arrow_forward</mat-icon>
+              </div>
+              <div class="value-item">
+                <div class="value-label">Attuale</div>
+                <div class="value-amount">{{ investment.currentValue | currency:'EUR' }}</div>
+              </div>
+            </div>
+            
+            <div class="investment-return-row">
+              <div class="return-label">Rendimento:</div>
+              <div class="return-values">
+                <span class="return-value" [ngClass]="{'positive-value': calculateReturn(investment) >= 0, 'negative-value': calculateReturn(investment) < 0}">
+                  {{ calculateReturn(investment) | currency:'EUR' }}
+                </span>
+                <span class="return-percentage" [ngClass]="{'positive-value': calculateReturnPercentage(investment) >= 0, 'negative-value': calculateReturnPercentage(investment) < 0}">
+                  ({{ calculateReturnPercentage(investment).toFixed(2) }}%)
+                  <mat-icon class="return-icon">
+                    {{ calculateReturnPercentage(investment) >= 0 ? 'arrow_upward' : 'arrow_downward' }}
+                  </mat-icon>
+                </span>
+              </div>
+            </div>
+            
+            <div class="investment-card-actions">
+              <button mat-button color="primary" [routerLink]="['/investments/edit', investment.id]">
+                <mat-icon>edit</mat-icon> Modifica
+              </button>
+              <button mat-button color="warn" (click)="deleteInvestment(investment.id!)">
+                <mat-icon>delete</mat-icon> Elimina
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+
+    <!-- Desktop View: Table -->
+    <div class="table-container hide-on-mobile">
+      <table mat-table [dataSource]="investments" class="investment-table">
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Nome</th>
+          <td mat-cell *matCellDef="let investment">
+            <div class="investment-name-cell">
+              <div class="investment-icon-mini">
+                <mat-icon>account_balance</mat-icon>
+              </div>
+              <span>{{ investment.name }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Initial Amount Column -->
+        <ng-container matColumnDef="initialAmount">
+          <th mat-header-cell *matHeaderCellDef>Importo Iniziale</th>
+          <td mat-cell *matCellDef="let investment">{{ investment.initialAmount | currency:'EUR' }}</td>
+        </ng-container>
+
+        <!-- Purchase Date Column -->
+        <ng-container matColumnDef="purchaseDate">
+          <th mat-header-cell *matHeaderCellDef>Data Acquisto</th>
+          <td mat-cell *matCellDef="let investment">{{ formatDate(investment.purchaseDate) }}</td>
+        </ng-container>
+
+        <!-- Current Value Column -->
+        <ng-container matColumnDef="currentValue">
+          <th mat-header-cell *matHeaderCellDef>Valore Attuale</th>
+          <td mat-cell *matCellDef="let investment">{{ investment.currentValue | currency:'EUR' }}</td>
+        </ng-container>
+
+        <!-- Return Column -->
+        <ng-container matColumnDef="return">
+          <th mat-header-cell *matHeaderCellDef>Rendimento</th>
+          <td mat-cell *matCellDef="let investment">
+            <span [ngClass]="{'positive-value': calculateReturn(investment) >= 0, 'negative-value': calculateReturn(investment) < 0}">
+              {{ calculateReturn(investment) | currency:'EUR' }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Return Percentage Column -->
+        <ng-container matColumnDef="returnPercentage">
+          <th mat-header-cell *matHeaderCellDef>Rendimento %</th>
+          <td mat-cell *matCellDef="let investment">
+            <div class="return-percentage-cell" [ngClass]="{'positive': calculateReturnPercentage(investment) >= 0, 'negative': calculateReturnPercentage(investment) < 0}">
+              <span>{{ calculateReturnPercentage(investment).toFixed(2) }}%</span>
+              <mat-icon class="return-icon-small">
+                {{ calculateReturnPercentage(investment) >= 0 ? 'arrow_upward' : 'arrow_downward' }}
+              </mat-icon>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="actions-column">Azioni</th>
+          <td mat-cell *matCellDef="let investment" class="actions-column">
+            <div class="action-buttons">
+              <button mat-icon-button color="primary" [routerLink]="['/investments/edit', investment.id]" matTooltip="Modifica">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="deleteInvestment(investment.id!)" matTooltip="Elimina">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
     </div>
   }
 </div>
+
+<style>
+  /* Investment Summary */
+  .investment-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+  
+  .summary-card {
+    border-radius: var(--border-radius-md);
+    background-color: white;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+  }
+  
+  .summary-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .summary-card mat-card-content {
+    padding: 24px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .summary-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--border-radius-md);
+    background-color: #3f51b5;
+    margin-right: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+  
+  .summary-icon mat-icon {
+    font-size: 28px;
+    height: 28px;
+    width: 28px;
+    color: white;
+  }
+  
+  .summary-icon.value-icon {
+    background-color: var(--primary-color);
+  }
+  
+  .summary-icon.return-icon {
+    background-color: var(--success-color);
+  }
+  
+  .summary-icon.return-icon.negative {
+    background-color: var(--danger-color);
+  }
+  
+  .summary-content {
+    flex: 1;
+  }
+  
+  .summary-label {
+    font-size: 14px;
+    color: var(--gray-600);
+    margin-bottom: 8px;
+  }
+  
+  .summary-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--gray-900);
+  }
+  
+  .summary-value .percentage {
+    font-size: 16px;
+    margin-left: 6px;
+    color: var(--gray-600);
+  }
+  
+  /* Investment Card List */
+  .investment-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .investment-card {
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .investment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md) !important;
+  }
+  
+  .investment-card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .investment-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    background-color: var(--primary-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  }
+  
+  .investment-icon mat-icon {
+    color: white;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+  
+  .investment-details {
+    flex: 1;
+  }
+  
+  .investment-name {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 4px;
+    color: var(--gray-900);
+  }
+  
+  .investment-date {
+    font-size: 14px;
+    color: var(--gray-600);
+  }
+  
+  .investment-values {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-md);
+    padding: 16px;
+  }
+  
+  .value-item {
+    text-align: center;
+  }
+  
+  .value-label {
+    font-size: 14px;
+    color: var(--gray-600);
+    margin-bottom: 4px;
+  }
+  
+  .value-amount {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--gray-900);
+  }
+  
+  .value-separator {
+    color: var(--gray-400);
+  }
+  
+  .investment-return-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 0 8px;
+  }
+  
+  .return-label {
+    font-weight: 500;
+    color: var(--gray-700);
+  }
+  
+  .return-values {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  
+  .return-value {
+    font-weight: 600;
+    font-size: 16px;
+  }
+  
+  .return-percentage {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    font-size: 14px;
+  }
+  
+  .return-icon {
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+    margin-left: 4px;
+  }
+  
+  .investment-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    border-top: 1px solid var(--gray-200);
+    padding-top: 16px;
+  }
+  
+  /* Table Styles */
+  .table-container {
+    margin-bottom: 24px;
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .investment-table {
+    width: 100%;
+  }
+  
+  .investment-name-cell {
+    display: flex;
+    align-items: center;
+  }
+  
+  .investment-icon-mini {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background-color: rgba(63, 81, 181, 0.1);
+    margin-right: 12px;
+  }
+  
+  .investment-icon-mini mat-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+    color: var(--primary-color);
+  }
+  
+  .return-percentage-cell {
+    display: flex;
+    align-items: center;
+  }
+  
+  .return-percentage-cell.positive {
+    color: var(--success-color);
+  }
+  
+  .return-percentage-cell.negative {
+    color: var(--danger-color);
+  }
+  
+  .return-icon-small {
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+    margin-left: 4px;
+  }
+  
+  .actions-column {
+    width: 100px;
+    text-align: center;
+  }
+  
+  /* Add Button */
+  .add-button {
+    border-radius: 50px;
+    padding: 0 20px;
+    height: 40px;
+  }
+  
+  .add-button mat-icon {
+    margin-right: 8px;
+  }
+  
+  /* Error Card */
+  .error-card {
+    text-align: center;
+    padding: 32px;
+    margin-bottom: 24px;
+    
+    mat-icon {
+      font-size: 48px;
+      height: 48px;
+      width: 48px;
+      margin-bottom: 16px;
+    }
+    
+    h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      font-weight: 500;
+    }
+    
+    p {
+      margin: 0 0 24px;
+      color: var(--gray-600);
+    }
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .investment-summary {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    
+    .section-title {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    
+    .section-title > div:last-child {
+      width: 100%;
+    }
+  }
+</style>

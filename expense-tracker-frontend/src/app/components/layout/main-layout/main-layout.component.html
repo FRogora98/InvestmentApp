@@ -5,7 +5,7 @@
               [opened]="isSidenavOpen" class="sidenav">
     <!-- Sidebar Header -->
     <div class="sidenav-header">
-      <h1 class="app-title">Expense Tracker</h1>
+      <h1 class="app-title">Finance Pro</h1>
       <button mat-icon-button (click)="sidenav.close()" *ngIf="isSmallScreen">
         <mat-icon>close</mat-icon>
       </button>
@@ -14,11 +14,11 @@
     <!-- User Profile -->
     <div class="user-profile">
       <div class="avatar">
-        <img [src]="user.avatar" alt="User avatar" class="rounded-circle">
+        <img [src]="user.avatar || 'assets/images/default-avatar.png'" alt="User avatar">
       </div>
       <div class="user-info">
         <h2 class="user-name">{{ user.name }}</h2>
-        <span class="user-type">Premium Account</span>
+        <span class="user-type">{{ user.accountType || 'Standard' }} Account</span>
       </div>
     </div>
 
@@ -36,7 +36,7 @@
     <div class="sidenav-footer">
       <mat-divider></mat-divider>
       <a mat-list-item>
-        <mat-icon matListIcon>help</mat-icon>
+        <mat-icon matListIcon>help_outline</mat-icon>
         <span matLine>Supporto</span>
       </a>
       <a mat-list-item>
@@ -50,39 +50,69 @@
   <mat-sidenav-content>
     <!-- Toolbar -->
     <mat-toolbar color="primary">
-      <button mat-icon-button (click)="toggleSidenav()">
+      <button mat-icon-button (click)="toggleSidenav()" class="menu-button">
         <mat-icon>menu</mat-icon>
       </button>
+      
       <span class="toolbar-spacer"></span>
 
-      <!-- Notification Button -->
-      <button mat-icon-button [matMenuTriggerFor]="notificationMenu">
-        <mat-icon [matBadge]="3" matBadgeColor="accent">notifications</mat-icon>
+      <!-- Quick Actions -->
+      <button mat-flat-button color="accent" class="action-button hide-on-mobile" [routerLink]="['/transactions/add']">
+        <mat-icon>add</mat-icon>
+        Nuova Transazione
       </button>
-      <mat-menu #notificationMenu="matMenu">
-        <h3 mat-subheader>Notifiche</h3>
-        <a mat-menu-item>
-          <mat-icon>info</mat-icon>
-          <span>Nuova funzionalità disponibile</span>
-        </a>
-        <a mat-menu-item>
-          <mat-icon>update</mat-icon>
-          <span>Aggiornamento completato</span>
-        </a>
-        <a mat-menu-item>
-          <mat-icon>payment</mat-icon>
-          <span>Pagamento ricevuto</span>
-        </a>
+
+      <!-- Notification Button -->
+      <button mat-icon-button [matMenuTriggerFor]="notificationMenu" class="notification-button">
+        <mat-icon [matBadge]="getUnreadNotificationsCount()" matBadgeColor="accent" [matBadgeHidden]="getUnreadNotificationsCount() === 0">notifications</mat-icon>
+      </button>
+      <mat-menu #notificationMenu="matMenu" class="notification-menu">
+        <div class="notification-header">
+          <h3>Notifiche</h3>
+          <button mat-button color="primary" (click)="markAllNotificationsAsRead()">Segna tutte come lette</button>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="notification-list">
+          @for (notification of notifications; track notification.id) {
+            <a mat-menu-item class="notification-item" [ngClass]="{'unread': !notification.read}">
+              <div class="notification-icon" [ngClass]="notification.type">
+                <mat-icon>{{ notification.icon }}</mat-icon>
+              </div>
+              <div class="notification-content">
+                <div class="notification-title">{{ notification.title }}</div>
+                <div class="notification-message">{{ notification.message }}</div>
+                <div class="notification-time">{{ notification.time }}</div>
+              </div>
+            </a>
+          }
+        </div>
+        <mat-divider></mat-divider>
+        <div class="notification-footer">
+          <a mat-button color="primary" class="view-all">Vedi tutte le notifiche</a>
+        </div>
       </mat-menu>
 
       <!-- User Menu -->
-      <button mat-icon-button [matMenuTriggerFor]="userMenu">
-        <mat-icon>person</mat-icon>
+      <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-menu-button">
+        <div class="user-avatar-small">
+          <img [src]="user.avatar || 'assets/images/default-avatar.png'" alt="User avatar">
+        </div>
       </button>
-      <mat-menu #userMenu="matMenu">
+      <mat-menu #userMenu="matMenu" class="user-menu">
+        <div class="user-menu-header">
+          <div class="user-info">
+            <h4>{{ user.name }}</h4>
+            <p>{{ user.email || 'No email provided' }}</p>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
         <a mat-menu-item>
           <mat-icon>person</mat-icon>
-          <span>Profilo</span>
+          <span>Il mio profilo</span>
+        </a>
+        <a mat-menu-item>
+          <mat-icon>account_balance_wallet</mat-icon>
+          <span>I miei conti</span>
         </a>
         <a mat-menu-item>
           <mat-icon>settings</mat-icon>
@@ -102,3 +132,162 @@
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
+
+<style>
+  /* Notification menu customization - This is added inline to ensure it affects even dynamically created elements */
+  ::ng-deep .notification-menu {
+    min-width: 340px !important;
+    max-width: 380px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border-radius: var(--border-radius-md) !important;
+  }
+  
+  ::ng-deep .notification-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+  }
+  
+  ::ng-deep .notification-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  ::ng-deep .notification-list {
+    max-height: 360px;
+    overflow-y: auto;
+  }
+  
+  ::ng-deep .notification-item {
+    display: flex !important;
+    align-items: flex-start !important;
+    padding: 12px 16px !important;
+    border-left: 3px solid transparent;
+    height: auto !important;
+    white-space: normal !important;
+  }
+  
+  ::ng-deep .notification-item.unread {
+    background-color: rgba(63, 81, 181, 0.05) !important;
+    border-left-color: var(--primary-color);
+  }
+  
+  ::ng-deep .notification-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    border-radius: var(--border-radius-sm);
+    margin-right: 12px;
+  }
+  
+  ::ng-deep .notification-icon.success {
+    background-color: var(--success-light);
+  }
+  
+  ::ng-deep .notification-icon.success mat-icon {
+    color: var(--success-color);
+  }
+  
+  ::ng-deep .notification-icon.warning {
+    background-color: var(--warning-light);
+  }
+  
+  ::ng-deep .notification-icon.warning mat-icon {
+    color: var(--warning-color);
+  }
+  
+  ::ng-deep .notification-icon.info {
+    background-color: var(--info-light);
+  }
+  
+  ::ng-deep .notification-icon.info mat-icon {
+    color: var(--info-color);
+  }
+  
+  ::ng-deep .notification-content {
+    flex: 1;
+  }
+  
+  ::ng-deep .notification-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--gray-900);
+    margin-bottom: 4px;
+  }
+  
+  ::ng-deep .notification-message {
+    font-size: 13px;
+    color: var(--gray-700);
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+  
+  ::ng-deep .notification-time {
+    font-size: 12px;
+    color: var(--gray-500);
+  }
+  
+  ::ng-deep .notification-footer {
+    display: flex;
+    justify-content: center;
+    padding: 8px;
+  }
+  
+  ::ng-deep .notification-footer .view-all {
+    width: 100%;
+    text-align: center;
+  }
+  
+  /* User menu customization */
+  ::ng-deep .user-menu {
+    min-width: 240px !important;
+  }
+  
+  ::ng-deep .user-menu-header {
+    padding: 16px;
+  }
+  
+  ::ng-deep .user-menu-header h4 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  ::ng-deep .user-menu-header p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--gray-600);
+  }
+  
+  /* Small user avatar in toolbar */
+  .user-avatar-small {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .user-avatar-small img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* Action button styles */
+  .action-button {
+    margin-right: 16px;
+    height: 40px;
+    border-radius: 20px !important;
+    padding: 0 20px !important;
+  }
+  
+  .action-button mat-icon {
+    margin-right: 8px;
+  }
+</style>

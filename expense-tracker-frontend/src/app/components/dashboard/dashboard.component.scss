@@ -10,38 +10,11 @@
   justify-content: space-between;
 }
 
-@mixin card-shadow {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-
-  &:hover {
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-  }
-}
-
-@mixin icon-container($size, $bg-color) {
-  width: $size;
-  height: $size;
-  border-radius: 12px;
-  background-color: $bg-color;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 16px;
-
-  mat-icon {
-    color: white;
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
-  }
-}
-
 .dashboard-container {
   padding: 24px;
   max-width: 1600px;
   margin: 0 auto;
+  animation: fadeIn 0.4s ease-out;
 
   @media (max-width: 768px) {
     padding: 16px;
@@ -51,18 +24,24 @@
 // Header Styles
 .dashboard-header {
   @include flex-between;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--gray-200);
 
   .header-title {
     h1 {
       margin: 0;
-      font-weight: 500;
-      color: #333;
+      font-family: var(--font-family-heading);
+      font-weight: 600;
+      font-size: 32px;
+      color: var(--gray-900);
+      letter-spacing: -0.5px;
     }
 
     .text-muted {
-      color: #777;
+      color: var(--gray-600);
       margin: 8px 0 0 0;
+      font-size: 16px;
     }
   }
 
@@ -72,6 +51,20 @@
 
     .period-selector {
       margin-right: 8px;
+      border-radius: var(--border-radius-full);
+      border: none;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    ::ng-deep .mat-button-toggle-button {
+      height: 40px;
+      padding: 0 16px;
+    }
+    
+    ::ng-deep .mat-button-toggle-checked {
+      background-color: var(--primary-color);
+      color: white;
     }
   }
 
@@ -98,21 +91,27 @@
   padding: 48px;
   flex-direction: column;
   text-align: center;
-  background-color: #f9f9fa;
-  border-radius: 8px;
+  background-color: white;
+  border-radius: var(--border-radius-lg);
   margin-bottom: 24px;
+  box-shadow: var(--shadow-md);
 
   mat-icon {
     font-size: 48px;
     height: 48px;
     width: 48px;
     margin-bottom: 16px;
-    color: #f44336;
+    color: var(--danger-color);
   }
 
   span {
     font-size: 16px;
     margin-bottom: 16px;
+    color: var(--gray-800);
+  }
+  
+  button {
+    margin-top: 8px;
   }
 }
 
@@ -124,7 +123,8 @@
 
 // Dashboard Section Styles
 .dashboard-section {
-  margin-bottom: 24px;
+  margin-bottom: 32px;
+  animation: fadeIn 0.4s ease-out;
 
   .section-title {
     @include flex-between;
@@ -132,15 +132,18 @@
 
     h2 {
       margin: 0;
-      font-size: 20px;
-      font-weight: 500;
+      font-size: 24px;
+      font-weight: 600;
+      font-family: var(--font-family-heading);
+      color: var(--gray-900);
     }
 
     .section-subtitle {
-      font-size: 14px;
-      color: #777;
+      font-size: 15px;
+      color: var(--gray-600);
       margin-top: 4px;
       font-weight: normal;
+      display: block;
     }
 
     .section-actions {
@@ -150,32 +153,43 @@
   }
 
   .dashboard-card {
-    @include card-shadow;
-    border-radius: 12px;
+    border-radius: var(--border-radius-lg);
     overflow: hidden;
+    box-shadow: var(--shadow-md);
+    background-color: white;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
 
     mat-card-content {
-      padding: 16px;
+      padding: 24px;
 
       @media (max-width: 768px) {
-        padding: 12px;
+        padding: 16px;
       }
     }
 
     .card-header {
       @include flex-between;
-      margin-bottom: 16px;
+      margin-bottom: 24px;
       flex-wrap: wrap;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--gray-100);
 
       h3 {
         margin: 0;
-        font-size: 18px;
-        font-weight: 500;
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--gray-900);
       }
 
       .card-subtitle {
         font-size: 14px;
-        color: #777;
+        color: var(--gray-600);
+        font-weight: 400;
       }
 
       @media (max-width: 768px) {
@@ -205,14 +219,22 @@
 .summary-tiles-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
+  gap: 24px;
 
   .summary-tile {
-    @include card-shadow;
-    border-radius: 12px;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    background-color: white;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
 
     &.negative-value .tile-value {
-      color: #f44336;
+      color: var(--danger-color);
     }
 
     mat-card-content {
@@ -221,40 +243,64 @@
     }
 
     .tile-icon {
-      @include icon-container(56px, #3f51b5);
+      width: 64px;
+      height: 64px;
+      border-radius: var(--border-radius-md);
+      background-color: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+      mat-icon {
+        color: white;
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+      }
     }
 
     .tile-content {
       flex: 1;
 
       .tile-title {
-        font-size: 14px;
-        color: #777;
-        margin-bottom: 4px;
+        font-size: 15px;
+        color: var(--gray-600);
+        margin-bottom: 8px;
+        font-weight: 500;
       }
 
       .tile-value {
-        font-size: 24px;
-        font-weight: 500;
-        margin-bottom: 4px;
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-family: var(--font-family-heading);
+        color: var(--gray-900);
       }
 
       .tile-subtitle {
-        font-size: 13px;
-        color: #777;
-        margin-bottom: 8px;
+        font-size: 14px;
+        color: var(--gray-700);
+        margin-bottom: 12px;
       }
 
       .tile-trend {
         @include flex-center;
-        font-size: 13px;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: var(--border-radius-full);
+        width: fit-content;
 
         &.trend-positive {
-          color: #4caf50;
+          color: var(--success-color);
+          background-color: var(--success-light);
         }
 
         &.trend-negative {
-          color: #f44336;
+          color: var(--danger-color);
+          background-color: var(--danger-light);
         }
 
         .trend-icon {
@@ -282,7 +328,8 @@
 
   .chart-area {
     flex: 1;
-    min-height: 300px;
+    min-height: 320px;
+    padding: 16px 0;
 
     @media (max-width: 768px) {
       margin-bottom: 24px;
@@ -292,8 +339,8 @@
 
 // Category List
 .category-list {
-  width: 260px;
-  padding-left: 16px;
+  width: 280px;
+  padding-left: 24px;
 
   @media (max-width: 768px) {
     width: 100%;
@@ -302,38 +349,66 @@
 
   h4 {
     margin: 0 0 16px 0;
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gray-900);
   }
 
   .category-item {
     @include flex-between;
     margin-bottom: 16px;
+    padding: 10px 12px;
+    border-radius: var(--border-radius-md);
+    background-color: var(--gray-50);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+      background-color: white;
+    }
 
     .category-info {
       @include flex-center;
 
       .category-icon-container {
-        @include icon-container(40px, #3f51b5);
+        width: 40px;
+        height: 40px;
+        border-radius: var(--border-radius-sm);
+        background-color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         margin-right: 12px;
-        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+
+        mat-icon {
+          color: white;
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
       }
 
       .category-details {
         .category-name {
-          font-size: 14px;
-          font-weight: 500;
+          font-size: 15px;
+          font-weight: 600;
+          color: var(--gray-900);
         }
 
         .category-percentage {
-          font-size: 12px;
-          color: #777;
+          font-size: 13px;
+          color: var(--gray-600);
+          margin-top: 2px;
         }
       }
     }
 
     .category-amount {
-      font-weight: 500;
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--gray-900);
     }
   }
 }
@@ -341,39 +416,57 @@
 // Investment List
 .investment-content {
   .investment-list {
-    margin-top: 16px;
+    margin-top: 24px;
 
     h4 {
       margin: 0 0 16px 0;
-      font-size: 16px;
-      font-weight: 500;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--gray-900);
     }
 
     .investment-item {
       @include flex-between;
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-
-      &:last-child {
-        border-bottom: none;
+      padding: 16px;
+      border-radius: var(--border-radius-md);
+      margin-bottom: 12px;
+      background-color: var(--gray-50);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+        background-color: white;
       }
 
       .investment-info {
         .investment-name {
-          font-weight: 500;
-          font-size: 15px;
+          font-weight: 600;
+          font-size: 16px;
+          color: var(--gray-900);
         }
 
         .investment-details {
-          font-size: 13px;
-          color: #777;
+          font-size: 14px;
+          color: var(--gray-600);
           margin-top: 4px;
         }
       }
 
       .investment-return {
         @include flex-center;
-        font-weight: 500;
+        font-weight: 600;
+        font-size: 16px;
+        padding: 6px 12px;
+        border-radius: var(--border-radius-full);
+
+        &.positive-value {
+          background-color: var(--success-light);
+        }
+        
+        &.negative-value {
+          background-color: var(--danger-light);
+        }
 
         .small-icon {
           font-size: 16px;
@@ -390,28 +483,49 @@
 .transactions-list {
   .transaction-item {
     @include flex-center;
-    padding: 16px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 16px;
+    border-radius: var(--border-radius-md);
+    margin-bottom: 12px;
+    background-color: var(--gray-50);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+      background-color: white;
 
-    &:last-child {
-      border-bottom: none;
+      .transaction-actions {
+        opacity: 1;
+      }
     }
 
     .transaction-icon {
-      @include icon-container(40px, #777);
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       margin-right: 16px;
-      border-radius: 50%;
+      border-radius: var(--border-radius-lg);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
 
       &.expense-bg {
-        background-color: #f44336;
+        background-color: var(--danger-color);
       }
 
       &.income-bg {
-        background-color: #4caf50;
+        background-color: var(--success-color);
       }
 
       &.investment-bg {
-        background-color: #9c27b0;
+        background-color: var(--primary-color);
+      }
+      
+      mat-icon {
+        color: white;
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
       }
     }
 
@@ -419,11 +533,13 @@
       flex: 1;
 
       .transaction-title {
-        font-weight: 500;
+        font-weight: 600;
+        font-size: 16px;
+        color: var(--gray-900);
 
         .transaction-label {
-          font-size: 12px;
-          color: #777;
+          font-size: 13px;
+          color: var(--gray-600);
           font-weight: normal;
           margin-left: 8px;
 
@@ -435,39 +551,55 @@
       }
 
       .transaction-date {
-        font-size: 13px;
-        color: #777;
+        font-size: 14px;
+        color: var(--gray-600);
+        margin-top: 2px;
       }
     }
 
     .transaction-amount {
-      font-weight: 500;
+      font-weight: 600;
+      font-size: 16px;
       margin-right: 16px;
       text-align: right;
-      min-width: 100px;
+      min-width: 120px;
+      
+      &.expense-value {
+        color: var(--danger-color);
+      }
+      
+      &.income-value {
+        color: var(--success-color);
+      }
+      
+      &.investment-value {
+        color: var(--primary-color);
+      }
     }
 
     .transaction-actions {
       opacity: 0;
       transition: opacity 0.2s ease;
     }
-
-    &:hover .transaction-actions {
-      opacity: 1;
-    }
   }
 
   .view-all-link {
     text-align: center;
-    margin-top: 16px;
+    margin-top: 20px;
 
     a {
-      color: #3f51b5;
+      color: var(--primary-color);
       text-decoration: none;
       font-weight: 500;
-
+      font-size: 15px;
+      padding: 8px 16px;
+      border-radius: var(--border-radius-full);
+      transition: background-color 0.2s ease;
+      display: inline-block;
+      
       &:hover {
-        text-decoration: underline;
+        background-color: rgba(63, 81, 181, 0.08);
+        text-decoration: none;
       }
     }
   }
@@ -477,24 +609,37 @@
 .monthly-data-table {
   margin-top: 24px;
   overflow-x: auto;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  background-color: white;
 
   table {
     width: 100%;
     border-collapse: collapse;
 
     th, td {
-      padding: 12px 16px;
+      padding: 16px;
       text-align: left;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      border-bottom: 1px solid var(--gray-200);
     }
 
     th {
-      font-weight: 500;
-      color: #555;
+      font-weight: 600;
+      color: var(--gray-800);
+      font-size: 14px;
+      background-color: var(--gray-50);
+    }
+    
+    td {
+      font-size: 15px;
     }
 
     tr:last-child td {
       border-bottom: none;
+    }
+    
+    tr:hover td {
+      background-color: var(--gray-50);
     }
   }
 }
@@ -505,41 +650,49 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px;
+  padding: 48px 16px;
   text-align: center;
+  background-color: var(--gray-50);
+  border-radius: var(--border-radius-md);
 
   mat-icon {
-    font-size: 48px;
-    height: 48px;
-    width: 48px;
+    font-size: 64px;
+    height: 64px;
+    width: 64px;
     margin-bottom: 16px;
-    color: rgba(0, 0, 0, 0.2);
+    color: var(--gray-400);
   }
 
   p {
-    color: #777;
-    margin: 0 0 16px;
-    max-width: 240px;
+    color: var(--gray-700);
+    margin: 0 0 24px;
+    max-width: 320px;
+    font-size: 16px;
   }
 }
 
 // Value Colors
 .positive-value {
-  color: #4caf50;
+  color: var(--success-color);
+  font-weight: 600;
 }
 
 .negative-value {
-  color: #f44336;
+  color: var(--danger-color);
+  font-weight: 600;
 }
 
 .expense-value {
-  color: #f44336;
+  color: var(--danger-color);
+  font-weight: 600;
 }
 
 .income-value {
-  color: #4caf50;
+  color: var(--success-color);
+  font-weight: 600;
 }
 
 .investment-value {
-  color: #9c27b0;
+  color: var(--primary-color);
+  font-weight: 600;
 }

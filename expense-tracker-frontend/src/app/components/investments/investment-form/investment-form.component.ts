@@ -10,7 +10,7 @@ import { InvestmentService } from '../../../services/investment.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './investment-form.component.html',
-  styleUrls: ['./investment-form.component.css']
+  styleUrls: ['./investment-form.component.scss']
 })
 export class InvestmentFormComponent implements OnInit {
   investmentForm!: FormGroup;
